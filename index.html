@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <!-- Viewport: prevent font scaling on orientation change, allow user scaling for a11y -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <title>Clippr — Barbershop Booking</title>
+    <meta name="description" content="Barbershop booking and queue management system" />
+
+    <!-- Theme colour — matches brand-500 -->
+    <meta name="theme-color" content="#f59e0b" />
+
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+
+    <!-- Preload the app font for performance -->
+    <link rel="preconnect" href="https://fonts.bunny.net" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.bunny.net/css?family=inter:300,400,500,600,700&display=swap"
+    />
+
+    <!-- iOS standalone meta -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Clippr" />
+  </head>
+  <body class="bg-white text-slate-900 antialiased dark:bg-surface-900 dark:text-slate-100">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
