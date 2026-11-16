@@ -133,6 +133,7 @@ This runs all migrations in `supabase/migrations/` and seeds the database with:
 
 ### 5. Start the local Edge Function
 ```bash
+# Note: --no-verify-jwt is strictly for local testing. In production, JWT verification must always be ON.
 pnpm supabase functions serve create-barber --no-verify-jwt
 ```
 
@@ -195,6 +196,7 @@ Verify that all 9 tests report **`PASS`**:
    ```bash
    pnpm supabase functions deploy create-barber
    ```
+   > **Security Requirement**: The `create-barber` Edge Function must be deployed with JWT verification **ON** (default in Supabase CLI; never pass `--no-verify-jwt` outside local development). Configure the `ALLOWED_ORIGINS` environment variable in your Supabase dashboard or secrets (`pnpm supabase secrets set ALLOWED_ORIGINS="https://your-domain.com"`) to enforce origin allowlisting.
    *(The Edge Function automatically inherits `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` within the Supabase Cloud environment).*
 
 ### 2. Frontend Deployment (Vercel)

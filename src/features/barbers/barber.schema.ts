@@ -9,11 +9,12 @@ export const createBarberSchema = z.object({
   email: z
     .string()
     .min(1, 'Email is required')
+    .max(255, 'Email cannot exceed 255 characters')
     .email('Please enter a valid email address')
     .transform((val) => val.trim().toLowerCase()),
   password: z
     .string()
-    .min(6, 'Password must be at least 6 characters')
+    .min(8, 'Password must be at least 8 characters')
     .max(72, 'Password cannot exceed 72 characters'),
 })
 

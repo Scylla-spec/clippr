@@ -17,17 +17,27 @@ describe('createBarberSchema', () => {
     }
   })
 
-  it('rejects short passwords', () => {
+  it('rejects passwords under 8 characters', () => {
     const result = createBarberSchema.safeParse({
       fullName: 'Tinashe Hove',
       email: 'tinashe@infinitybarbers.local',
-      password: '12345',
+      password: '1234567', // 7 chars
     })
 
     expect(result.success).toBe(false)
   })
 
-  it('rejects invalid email', () => {
+  it('rejects passwords exceeding 72 characters', () => {
+    const result = createBarberSchema.safeParse({
+      fullName: 'Tinashe Hove',
+      email: 'tinashe@infinitybarbers.local',
+      password: 'a'.repeat(73),
+    })
+
+    expect(result.success).toBe(false)
+  })
+
+  it('rejects invalid email formats', () => {
     const result = createBarberSchema.safeParse({
       fullName: 'Tinashe Hove',
       email: 'tinashe',
@@ -37,9 +47,29 @@ describe('createBarberSchema', () => {
     expect(result.success).toBe(false)
   })
 
+  it('rejects emails exceeding 255 characters', () => {
+    const result = createBarberSchema.safeParse({
+      fullName: 'Tinashe Hove',
+      email: `${'a'.repeat(250)}@infinitybarbers.local`,
+      password: 'password123',
+    })
+
+    expect(result.success).toBe(false)
+  })
+
   it('rejects empty fullName', () => {
     const result = createBarberSchema.safeParse({
       fullName: '   ',
+      email: 'tinashe@infinitybarbers.local',
+      password: 'password123',
+    })
+
+    expect(result.success).toBe(false)
+  })
+
+  it('rejects fullName exceeding 100 characters', () => {
+    const result = createBarberSchema.safeParse({
+      fullName: 'a'.repeat(101),
       email: 'tinashe@infinitybarbers.local',
       password: 'password123',
     })

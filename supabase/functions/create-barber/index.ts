@@ -1,11 +1,4 @@
-// Follow Deno and Supabase Edge Function conventions
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
 
 interface CreateBarberPayload {
   email?: string
@@ -13,10 +6,43 @@ interface CreateBarberPayload {
   fullName?: string
 }
 
-serve(async (req: Request) => {
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+function getCorsHeaders(req: Request): Record<string, string> {
+  const origin = req.headers.get('Origin')
+  const allowedOriginsEnv = Deno.env.get('ALLOWED_ORIGINS') || ''
+  const allowedOrigins = allowedOriginsEnv
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean)
+
+  const headers: Record<string, string> = {
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Vary': 'Origin',
+  }
+
+  // If ALLOWED_ORIGINS is empty (dev) or origin matches the allowlist, reflect it
+  if (origin && (allowedOrigins.length === 0 || allowedOrigins.includes(origin))) {
+    headers['Access-Control-Allow-Origin'] = origin
+  }
+
+  return headers
+}
+
+Deno.serve(async (req: Request) => {
+  const corsHeaders = getCorsHeaders(req)
+
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
+  }
+
+  if (req.method !== 'POST') {
+    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
+      status: 405,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    })
   }
 
   try {
@@ -33,7 +59,8 @@ serve(async (req: Request) => {
     const anonKey = Deno.env.get('SUPABASE_ANON_KEY')
 
     if (!supabaseUrl || !serviceRoleKey || !anonKey) {
-      return new Response(JSON.stringify({ error: 'Edge function environment missing required keys' }), {
+      console.error('Missing required environment keys in create-barber function')
+      return new Response(JSON.stringify({ error: 'Server configuration error' }), {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
@@ -71,12 +98,21 @@ serve(async (req: Request) => {
     }
 
     // 2. Parse and validate body
-    const body: CreateBarberPayload = await req.json()
+    let body: CreateBarberPayload
+    try {
+      body = await req.json()
+    } catch {
+      return new Response(JSON.stringify({ error: 'Invalid JSON request payload' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
+
     const { email, password, fullName } = body
 
-    if (!email || !password || !fullName) {
+    if (!email || typeof email !== 'string' || !EMAIL_REGEX.test(email.trim()) || email.trim().length > 255) {
       return new Response(
-        JSON.stringify({ error: 'email, password, and fullName are all required' }),
+        JSON.stringify({ error: 'A valid email address under 255 characters is required' }),
         {
           status: 400,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -84,28 +120,53 @@ serve(async (req: Request) => {
       )
     }
 
-    if (password.length < 6) {
-      return new Response(JSON.stringify({ error: 'Password must be at least 6 characters' }), {
-        status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      })
+    if (!fullName || typeof fullName !== 'string' || fullName.trim().length < 1 || fullName.trim().length > 100) {
+      return new Response(
+        JSON.stringify({ error: 'Full name must be between 1 and 100 characters' }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        },
+      )
     }
+
+    if (!password || typeof password !== 'string' || password.length < 8 || password.length > 72) {
+      return new Response(
+        JSON.stringify({ error: 'Password must be between 8 and 72 characters' }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        },
+      )
+    }
+
+    const normalizedEmail = email.trim().toLowerCase()
+    const trimmedFullName = fullName.trim()
 
     // 3. Use admin service role client to create barber auth user
     const adminClient = createClient(supabaseUrl, serviceRoleKey)
 
     const { data: createdAuth, error: createError } = await adminClient.auth.admin.createUser({
-      email: email.trim().toLowerCase(),
+      email: normalizedEmail,
       password,
       email_confirm: true,
       user_metadata: {
-        full_name: fullName.trim(),
+        full_name: trimmedFullName,
         role: 'barber',
       },
     })
 
     if (createError || !createdAuth.user) {
-      return new Response(JSON.stringify({ error: createError?.message ?? 'Failed to create user' }), {
+      const errMsg = createError?.message ?? ''
+      if (errMsg.toLowerCase().includes('already') || errMsg.toLowerCase().includes('registered') || errMsg.toLowerCase().includes('exists')) {
+        return new Response(JSON.stringify({ error: 'A user with this email address already exists' }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+
+      console.error('Failed to create auth user:', createError)
+      return new Response(JSON.stringify({ error: 'Failed to create user account' }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
@@ -116,7 +177,7 @@ serve(async (req: Request) => {
       .from('profiles')
       .upsert({
         id: createdAuth.user.id,
-        full_name: fullName.trim(),
+        full_name: trimmedFullName,
         role: 'barber',
         is_active: true,
       })
@@ -124,7 +185,8 @@ serve(async (req: Request) => {
       .single()
 
     if (upsertError) {
-      return new Response(JSON.stringify({ error: upsertError.message }), {
+      console.error('Failed to upsert barber profile:', upsertError)
+      return new Response(JSON.stringify({ error: 'Failed to create barber profile' }), {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
@@ -141,8 +203,8 @@ serve(async (req: Request) => {
       },
     )
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Unknown server error'
-    return new Response(JSON.stringify({ error: message }), {
+    console.error('Unhandled server error in create-barber:', err)
+    return new Response(JSON.stringify({ error: 'An unexpected internal error occurred' }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
