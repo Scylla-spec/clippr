@@ -1,11 +1,14 @@
 /**
- * queue.ts — Pure queue-ordering logic.
+ * queue.ts — Pure queue-ordering logic and single source of truth for display order.
  *
  * This module is intentionally framework-free and has no Supabase imports.
  * It operates on the TodayQueueRow shape returned by the today_queue view.
  *
- * Both the admin day view and the barber dashboard use this same function
- * so they can never disagree on queue order.
+ * Although today_queue is queried with explicit .order() clauses in the data layer,
+ * SQL view ordering alone is not guaranteed across all drivers and operations.
+ * Therefore, queue.ts is the definitive, single place that decides the final display
+ * order (nowServing, upNext, remaining, completed) so that the admin day view and the
+ * barber dashboard can never disagree on queue structure or presentation.
  */
 
 import type { TodayQueueRow, BookingStatus } from '@/lib/database.types'
@@ -38,7 +41,7 @@ export interface QueueView {
  *   2. booked/waiting by start_time ASC
  *   3. terminal by start_time ASC (collapsed "Completed" section)
  *
- * @param rows — Raw rows from the today_queue view, unsorted.
+ * @param rows — Raw rows from the today_queue view.
  */
 export function buildQueueView(rows: TodayQueueRow[]): QueueView {
   const active = rows
@@ -108,7 +111,7 @@ export function getNextAvailableSlot(
  * Used in both trigger (SQL) and client-side UI to grey out invalid buttons.
  */
 export const VALID_TRANSITIONS: Partial<Record<BookingStatus, BookingStatus[]>> = {
-  booked:     ['waiting', 'in_service', 'cancelled'],
+  booked:     ['waiting', 'in_service', 'cancelled', 'no_show'],
   waiting:    ['in_service', 'cancelled', 'no_show'],
   in_service: ['done', 'no_show', 'cancelled'],
   // done, no_show, cancelled → no transitions (terminal)

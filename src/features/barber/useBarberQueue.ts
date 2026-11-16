@@ -33,6 +33,9 @@ export function useBarberQueue() {
         .from('today_queue')
         .select('*')
         .eq('barber_id', barberId)
+        .order('queue_bucket', { ascending: true })
+        .order('in_service_first', { ascending: true })
+        .order('start_time', { ascending: true })
 
       if (error) throw error
 

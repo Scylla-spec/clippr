@@ -174,4 +174,8 @@ describe('canTransition', () => {
   it('allows waiting → no_show', () => {
     expect(canTransition('waiting', 'no_show')).toBe(true)
   })
+
+  it('allows booked → no_show', () => {
+    expect(canTransition('booked', 'no_show')).toBe(true)
+  })
 })
