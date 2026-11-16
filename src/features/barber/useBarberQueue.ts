@@ -4,7 +4,6 @@ import toast from 'react-hot-toast'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/features/auth/useAuth'
 import { buildQueueView, type QueueView, canTransition } from '@/features/bookings/queue'
-import { toHarareDateString } from '@/lib/dates'
 import { REALTIME_FALLBACK_INTERVAL_MS } from '@/lib/constants'
 import type { TodayQueueRow, BookingStatus } from '@/lib/database.types'
 
@@ -30,89 +29,15 @@ export function useBarberQueue() {
         return { nowServing: null, upNext: null, remaining: [], completed: [] }
       }
 
-      try {
-        const { data, error } = await supabase
-          .from('today_queue')
-          .select('*')
-          .eq('barber_id', barberId)
+      const { data, error } = await supabase
+        .from('today_queue')
+        .select('*')
+        .eq('barber_id', barberId)
 
-        if (error) throw error
+      if (error) throw error
 
-        const rows = (data as unknown as TodayQueueRow[]) ?? []
-        return buildQueueView(rows)
-      } catch (err) {
-        if (import.meta.env.VITE_SUPABASE_URL?.includes('demo-barbershop')) {
-          const now = new Date()
-          const harareToday = toHarareDateString(now)
-          const demoRows: TodayQueueRow[] = [
-            {
-              id: '30000000-0000-0000-0000-000000000001',
-              barber_id: barberId,
-              client_id: '20000000-0000-0000-0000-000000000001',
-              service_id: '10000000-0000-0000-0000-000000000001',
-              start_time: `${harareToday}T08:00:00Z`,
-              end_time: `${harareToday}T08:30:00Z`,
-              status: 'in_service',
-              source: 'appointment',
-              created_by: '00000000-0000-0000-0000-000000000001',
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
-              client_name: 'Farai Mutasa',
-              client_phone: '+263771234567',
-              service_name: 'Standard Haircut',
-              duration_min: 30,
-              price: 5.0,
-              barber_name: user?.profile?.full_name || 'Tendai Moyo',
-              queue_bucket: 1,
-              in_service_first: 0,
-            },
-            {
-              id: '30000000-0000-0000-0000-000000000002',
-              barber_id: barberId,
-              client_id: '20000000-0000-0000-0000-000000000002',
-              service_id: '10000000-0000-0000-0000-000000000004',
-              start_time: `${harareToday}T08:30:00Z`,
-              end_time: `${harareToday}T09:15:00Z`,
-              status: 'waiting',
-              source: 'walk_in',
-              created_by: '00000000-0000-0000-0000-000000000001',
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
-              client_name: 'Simba Ncube',
-              client_phone: '+263772345678',
-              service_name: 'Cut & Beard Combo',
-              duration_min: 45,
-              price: 8.0,
-              barber_name: user?.profile?.full_name || 'Tendai Moyo',
-              queue_bucket: 1,
-              in_service_first: 1,
-            },
-            {
-              id: '30000000-0000-0000-0000-000000000004',
-              barber_id: barberId,
-              client_id: '20000000-0000-0000-0000-000000000004',
-              service_id: '10000000-0000-0000-0000-000000000002',
-              start_time: `${harareToday}T09:30:00Z`,
-              end_time: `${harareToday}T09:55:00Z`,
-              status: 'booked',
-              source: 'appointment',
-              created_by: '00000000-0000-0000-0000-000000000001',
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
-              client_name: 'Blessing Moyo',
-              client_phone: '+263774567890',
-              service_name: 'Hot Towel Shave',
-              duration_min: 25,
-              price: 4.0,
-              barber_name: user?.profile?.full_name || 'Tendai Moyo',
-              queue_bucket: 1,
-              in_service_first: 1,
-            },
-          ]
-          return buildQueueView(demoRows)
-        }
-        throw err
-      }
+      const rows = (data as unknown as TodayQueueRow[]) ?? []
+      return buildQueueView(rows)
     },
     // Conservative refetch interval as fallback on mobile connections
     refetchInterval: REALTIME_FALLBACK_INTERVAL_MS,

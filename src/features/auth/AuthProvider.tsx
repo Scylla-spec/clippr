@@ -7,6 +7,9 @@ import { logger } from '@/lib/logger'
 import type { AuthUser, SignInCredentials, UserProfile } from './auth.types'
 import { AuthContext } from './useAuth'
 
+const INACTIVE_OR_MISSING_PROFILE_MSG =
+  'This account is inactive or not set up. Contact the shop admin.'
+
 async function fetchProfile(userId: string): Promise<UserProfile | null> {
   try {
     const { data, error } = await supabase
@@ -51,7 +54,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = useCallback(async () => {
     try {
-      localStorage.removeItem('infinity_demo_user')
       await supabase.auth.signOut()
     } catch (err) {
       logger.error('Sign out error', err)
@@ -63,39 +65,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signIn = useCallback(
     async ({ email, password }: SignInCredentials): Promise<{ error?: string }> => {
-      // Demo fallback helper
-      const tryDemoLogin = () => {
-        if (email.endsWith('@infinitybarbers.local')) {
-          const role = email.startsWith('admin') ? 'admin' : 'barber'
-          const name = email.startsWith('admin')
-            ? 'Shop Admin'
-            : email.startsWith('tendai')
-            ? 'Tendai Moyo'
-            : 'Rudo Chikwanda'
-          const id = email.startsWith('admin')
-            ? '00000000-0000-0000-0000-000000000001'
-            : email.startsWith('tendai')
-            ? '00000000-0000-0000-0000-000000000002'
-            : '00000000-0000-0000-0000-000000000003'
-
-          const mockUser: AuthUser = {
-            id,
-            email,
-            profile: {
-              id,
-              role,
-              full_name: name,
-              is_active: true,
-              created_at: new Date().toISOString(),
-            },
-          }
-          localStorage.setItem('infinity_demo_user', JSON.stringify(mockUser))
-          setUser(mockUser)
-          return true
-        }
-        return false
-      }
-
       try {
         const { data, error } = await supabase.auth.signInWithPassword({
           email,
@@ -103,21 +72,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         })
 
         if (error) {
-          if (tryDemoLogin()) return {}
           logger.warn('Sign-in failed', error.message)
           return { error: error.message }
         }
 
         if (!data.user) {
-          if (tryDemoLogin()) return {}
           return { error: 'No user returned from authentication' }
         }
 
         const profile = await fetchProfile(data.user.id)
 
-        if (profile && !profile.is_active) {
+        if (!profile || !profile.is_active) {
           await supabase.auth.signOut()
-          return { error: 'Your account has been deactivated. Please contact an admin.' }
+          return { error: INACTIVE_OR_MISSING_PROFILE_MSG }
         }
 
         if (data.session) {
@@ -126,7 +93,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         return {}
       } catch (err) {
-        if (tryDemoLogin()) return {}
         const msg = err instanceof Error ? err.message : 'An unexpected error occurred'
         return { error: msg }
       }
@@ -137,17 +103,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let isMounted = true
 
-    // Check demo user in localStorage first
-    const demoUser = localStorage.getItem('infinity_demo_user')
-    if (demoUser) {
-      try {
-        const parsed = JSON.parse(demoUser)
-        setUser(parsed)
-        setIsLoading(false)
-        return
-      } catch {}
-    }
-
     // Initialize session on mount
     void supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (!isMounted) return
@@ -156,8 +111,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const profile = await fetchProfile(session.user.id)
         if (!isMounted) return
 
-        if (profile && !profile.is_active) {
-          toast.error('Account deactivated')
+        if (!profile || !profile.is_active) {
+          toast.error(INACTIVE_OR_MISSING_PROFILE_MSG)
           await supabase.auth.signOut()
           setUser(null)
           await clearAuthCache()
@@ -189,8 +144,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const profile = await fetchProfile(session.user.id)
         if (!isMounted) return
 
-        if (profile && !profile.is_active) {
-          toast.error('Account deactivated')
+        if (!profile || !profile.is_active) {
+          toast.error(INACTIVE_OR_MISSING_PROFILE_MSG)
           await supabase.auth.signOut()
           setUser(null)
           await clearAuthCache()

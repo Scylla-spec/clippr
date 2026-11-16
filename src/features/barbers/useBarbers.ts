@@ -7,30 +7,45 @@ import type { CreateBarberFormData } from './barber.schema'
 export const BARBERS_QUERY_KEY = ['barbers'] as const
 
 /**
+ * Maps edge function error responses to friendly user messages.
+ */
+function mapCreateBarberError(err: unknown): string {
+  if (err instanceof Error) {
+    const msg = err.message
+    const lower = msg.toLowerCase()
+
+    if (lower.includes('failed to send a request') || lower.includes('failed to fetch')) {
+      return 'Unable to reach the server. Please verify the create-barber Edge Function is deployed.'
+    }
+    if (lower.includes('already registered') || lower.includes('already exists') || lower.includes('duplicate')) {
+      return 'A barber account with this email address already exists.'
+    }
+    if (lower.includes('forbidden') || lower.includes('administrator') || lower.includes('403')) {
+      return 'Permission denied: Only active administrators can add barbers.'
+    }
+    if (lower.includes('unauthorized') || lower.includes('token') || lower.includes('401')) {
+      return 'Your session has expired. Please sign in again.'
+    }
+    return msg
+  }
+  return 'Failed to create barber account. Please try again.'
+}
+
+/**
  * Fetch all barbers (active and inactive) for admin management.
  */
 export function useBarbers() {
   return useQuery({
     queryKey: BARBERS_QUERY_KEY,
     queryFn: async (): Promise<Profile[]> => {
-      try {
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('role', 'barber')
-          .order('created_at', { ascending: false })
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('role', 'barber')
+        .order('created_at', { ascending: false })
 
-        if (error) throw error
-        return data ?? []
-      } catch (err) {
-        if (import.meta.env.VITE_SUPABASE_URL?.includes('demo-barbershop')) {
-          return [
-            { id: '00000000-0000-0000-0000-000000000002', full_name: 'Tendai Moyo', role: 'barber', is_active: true, created_at: new Date().toISOString() },
-            { id: '00000000-0000-0000-0000-000000000003', full_name: 'Rudo Chikwanda', role: 'barber', is_active: true, created_at: new Date().toISOString() },
-          ]
-        }
-        throw err
-      }
+      if (error) throw error
+      return data ?? []
     },
   })
 }
@@ -44,34 +59,17 @@ export function useCreateBarber() {
 
   return useMutation({
     mutationFn: async (input: CreateBarberFormData) => {
-      // 1. Try PostgreSQL RPC stored procedure first (runs directly inside database)
-      const { data: rpcData, error: rpcError } = await (supabase.rpc as any)('create_barber', {
-        new_email: input.email.trim().toLowerCase(),
-        new_full_name: input.fullName.trim(),
-        new_password: input.password,
-      })
-
-      if (!rpcError && rpcData) {
-        return rpcData
-      }
-
-      // If RPC failed because user already exists or validation error, throw immediately
-      if (rpcError && rpcError.message && !rpcError.message.includes('function') && !rpcError.message.includes('does not exist')) {
-        throw new Error(rpcError.message)
-      }
-
-      // 2. Fallback to Edge Function
       const { data, error } = await supabase.functions.invoke('create-barber', {
         body: input,
       })
 
       if (error) {
-        throw new Error(rpcError?.message || error.message || 'Failed to create barber')
+        throw new Error(mapCreateBarberError(error))
       }
 
-      // Check if function returned an error payload
       if (data && typeof data === 'object' && 'error' in data) {
-        throw new Error(String(data.error))
+        const serverError = new Error(String((data as { error: unknown }).error))
+        throw new Error(mapCreateBarberError(serverError))
       }
 
       return data

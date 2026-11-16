@@ -14,30 +14,18 @@ export function useServices(includeInactive = true) {
   return useQuery({
     queryKey: [...SERVICES_QUERY_KEY, { includeInactive }],
     queryFn: async (): Promise<Service[]> => {
-      try {
-        let query = supabase
-          .from('services')
-          .select('*')
-          .order('name', { ascending: true })
+      let query = supabase
+        .from('services')
+        .select('*')
+        .order('name', { ascending: true })
 
-        if (!includeInactive) {
-          query = query.eq('is_active', true)
-        }
-
-        const { data, error } = await query
-        if (error) throw error
-        return data ?? []
-      } catch (err) {
-        if (import.meta.env.VITE_SUPABASE_URL?.includes('demo-barbershop')) {
-          return [
-            { id: '10000000-0000-0000-0000-000000000001', name: 'Standard Haircut', duration_min: 30, price: 5.0, is_active: true, created_at: new Date().toISOString() },
-            { id: '10000000-0000-0000-0000-000000000002', name: 'Hot Towel Shave', duration_min: 25, price: 4.0, is_active: true, created_at: new Date().toISOString() },
-            { id: '10000000-0000-0000-0000-000000000003', name: 'Beard Trim & Shape', duration_min: 20, price: 3.5, is_active: true, created_at: new Date().toISOString() },
-            { id: '10000000-0000-0000-0000-000000000004', name: 'Cut & Beard Combo', duration_min: 45, price: 8.0, is_active: true, created_at: new Date().toISOString() },
-          ]
-        }
-        throw err
+      if (!includeInactive) {
+        query = query.eq('is_active', true)
       }
+
+      const { data, error } = await query
+      if (error) throw error
+      return data ?? []
     },
   })
 }

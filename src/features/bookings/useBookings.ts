@@ -65,65 +65,9 @@ export function useDayBookings(dateString: string, barberId?: string) {
         query = query.eq('barber_id', barberId)
       }
 
-      try {
-        const { data, error } = await query
-        if (error) throw error
-        return (data as unknown as BookingWithDetails[]) ?? []
-      } catch (err) {
-        if (import.meta.env.VITE_SUPABASE_URL?.includes('demo-barbershop')) {
-          return [
-            {
-              id: '30000000-0000-0000-0000-000000000001',
-              barber_id: barberId || '00000000-0000-0000-0000-000000000002',
-              service_id: '10000000-0000-0000-0000-000000000001',
-              client_id: '20000000-0000-0000-0000-000000000001',
-              start_time: `${dateString}T08:00:00Z`,
-              end_time: `${dateString}T08:30:00Z`,
-              status: 'in_service',
-              source: 'appointment',
-              created_by: '00000000-0000-0000-0000-000000000001',
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
-              client: { id: '20000000-0000-0000-0000-000000000001', full_name: 'Farai Mutasa', phone: '+263771234567' },
-              service: { id: '10000000-0000-0000-0000-000000000001', name: 'Standard Haircut', duration_min: 30, price: 5.0 },
-              barber: { id: '00000000-0000-0000-0000-000000000002', full_name: 'Tendai Moyo' },
-            },
-            {
-              id: '30000000-0000-0000-0000-000000000002',
-              barber_id: barberId || '00000000-0000-0000-0000-000000000002',
-              service_id: '10000000-0000-0000-0000-000000000004',
-              client_id: '20000000-0000-0000-0000-000000000002',
-              start_time: `${dateString}T08:30:00Z`,
-              end_time: `${dateString}T09:15:00Z`,
-              status: 'waiting',
-              source: 'walk_in',
-              created_by: '00000000-0000-0000-0000-000000000001',
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
-              client: { id: '20000000-0000-0000-0000-000000000002', full_name: 'Simba Ncube', phone: '+263772345678' },
-              service: { id: '10000000-0000-0000-0000-000000000004', name: 'Cut & Beard Combo', duration_min: 45, price: 8.0 },
-              barber: { id: '00000000-0000-0000-0000-000000000002', full_name: 'Tendai Moyo' },
-            },
-            {
-              id: '30000000-0000-0000-0000-000000000003',
-              barber_id: barberId || '00000000-0000-0000-0000-000000000003',
-              service_id: '10000000-0000-0000-0000-000000000003',
-              client_id: '20000000-0000-0000-0000-000000000003',
-              start_time: `${dateString}T09:30:00Z`,
-              end_time: `${dateString}T09:50:00Z`,
-              status: 'booked',
-              source: 'appointment',
-              created_by: '00000000-0000-0000-0000-000000000001',
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
-              client: { id: '20000000-0000-0000-0000-000000000003', full_name: 'Tatenda Chitiyo', phone: '+263773456789' },
-              service: { id: '10000000-0000-0000-0000-000000000003', name: 'Beard Trim & Shape', duration_min: 20, price: 3.5 },
-              barber: { id: '00000000-0000-0000-0000-000000000003', full_name: 'Rudo Chikwanda' },
-            },
-          ]
-        }
-        throw err
-      }
+      const { data, error } = await query
+      if (error) throw error
+      return (data as unknown as BookingWithDetails[]) ?? []
     },
   })
 }
