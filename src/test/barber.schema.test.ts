@@ -5,14 +5,14 @@ describe('createBarberSchema', () => {
   it('validates a complete barber creation payload', () => {
     const result = createBarberSchema.safeParse({
       fullName: '  Tinashe Hove  ',
-      email: 'Tinashe@Clippr.local',
+      email: 'Tinashe@InfinityBarbers.local',
       password: 'password123',
     })
 
     expect(result.success).toBe(true)
     if (result.success) {
       expect(result.data.fullName).toBe('Tinashe Hove')
-      expect(result.data.email).toBe('tinashe@clippr.local')
+      expect(result.data.email).toBe('tinashe@infinitybarbers.local')
       expect(result.data.password).toBe('password123')
     }
   })
@@ -20,7 +20,7 @@ describe('createBarberSchema', () => {
   it('rejects short passwords', () => {
     const result = createBarberSchema.safeParse({
       fullName: 'Tinashe Hove',
-      email: 'tinashe@clippr.local',
+      email: 'tinashe@infinitybarbers.local',
       password: '12345',
     })
 
@@ -40,7 +40,7 @@ describe('createBarberSchema', () => {
   it('rejects empty fullName', () => {
     const result = createBarberSchema.safeParse({
       fullName: '   ',
-      email: 'tinashe@clippr.local',
+      email: 'tinashe@infinitybarbers.local',
       password: 'password123',
     })
 

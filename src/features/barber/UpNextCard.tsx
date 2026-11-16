@@ -1,3 +1,4 @@
+import { ArrowRight, Phone, Clock, Scissors } from 'lucide-react'
 import type { TodayQueueRow } from '@/lib/database.types'
 import { formatTimeInHarare } from '@/lib/dates'
 import { Button } from '@/components/ui/Button'
@@ -34,9 +35,7 @@ export function UpNextCard({
       <CardBody className="p-5 space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1.5">
-            <span className="text-base" aria-hidden="true">
-              👉
-            </span>
+            <ArrowRight className="h-4 w-4 text-brand-600 dark:text-brand-400" aria-hidden="true" />
             <span className="text-xs font-bold uppercase tracking-wider text-brand-700 dark:text-brand-400">
               Up Next
             </span>
@@ -61,14 +60,16 @@ export function UpNextCard({
             <h3 className="text-xl font-bold text-surface-900 dark:text-white">
               {booking.client_name}
             </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
-              📞 {booking.client_phone}
+            <p className="inline-flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400">
+              <Phone className="h-3.5 w-3.5 text-slate-400" aria-hidden="true" />
+              <span>{booking.client_phone}</span>
             </p>
           </div>
 
-          <div className="text-sm font-medium text-slate-700 dark:text-slate-200">
-            <span>🕒 {formatTimeInHarare(booking.start_time)}</span>
-            <span className="ml-2 font-normal text-xs text-slate-500">({booking.service_name})</span>
+          <div className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-700 dark:text-slate-200">
+            <Clock className="h-3.5 w-3.5 text-slate-400" aria-hidden="true" />
+            <span>{formatTimeInHarare(booking.start_time)}</span>
+            <span className="font-normal text-xs text-slate-500">({booking.service_name})</span>
           </div>
         </div>
 
@@ -78,12 +79,19 @@ export function UpNextCard({
             type="button"
             variant="primary"
             size="md"
-            className="flex-1 min-h-[48px] font-bold"
+            className="flex-1 min-h-[48px] font-bold flex items-center justify-center gap-2"
             disabled={hasActiveInService}
             isLoading={isUpdating}
             onClick={() => void onStartService(booking)}
           >
-            {hasActiveInService ? 'Finish current service first' : '▶ Start Service'}
+            {hasActiveInService ? (
+              <span>Finish current service first</span>
+            ) : (
+              <>
+                <Scissors className="h-4 w-4" aria-hidden="true" />
+                <span>Start Service</span>
+              </>
+            )}
           </Button>
 
           <Button

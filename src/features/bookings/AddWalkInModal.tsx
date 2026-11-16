@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Footprints } from 'lucide-react'
 import { walkInSchema, type WalkInFormData } from './booking.schema'
 import { useServices } from '@/features/services/useServices'
 import { useBarbers } from '@/features/barbers/useBarbers'
@@ -64,9 +65,7 @@ export function AddWalkInModal({
     >
       <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl dark:bg-surface-800">
         <div className="flex items-center gap-2">
-          <span className="text-xl" aria-hidden="true">
-            ⚡
-          </span>
+          <Footprints className="h-5 w-5 text-brand-600 dark:text-brand-400" aria-hidden="true" />
           <h2 id="walk-in-title" className="text-lg font-bold text-surface-900 dark:text-white">
             Quick Add Walk-in
           </h2>

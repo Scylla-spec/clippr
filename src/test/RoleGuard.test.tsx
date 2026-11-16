@@ -11,7 +11,7 @@ describe('RoleGuard', () => {
     vi.spyOn(useAuthModule, 'useAuth').mockReturnValue({
       user: {
         id: 'user-1',
-        email: 'barber@clippr.local',
+        email: 'barber@infinitybarbers.local',
         profile: {
           id: 'user-1',
           full_name: 'Barber Tendai',
@@ -49,7 +49,7 @@ describe('RoleGuard', () => {
     vi.spyOn(useAuthModule, 'useAuth').mockReturnValue({
       user: {
         id: 'admin-1',
-        email: 'admin@clippr.local',
+        email: 'admin@infinitybarbers.local',
         profile: {
           id: 'admin-1',
           full_name: 'Shop Admin',

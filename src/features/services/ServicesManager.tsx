@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Timer, Banknote, Armchair } from 'lucide-react'
 import {
   useServices,
   useCreateService,
@@ -73,7 +74,7 @@ export function ServicesManager() {
         <Card>
           <CardBody>
             <EmptyState
-              icon="💈"
+              icon={<Armchair className="h-10 w-10 text-slate-400" aria-hidden="true" />}
               title="No services configured"
               description="Add services such as Haircuts or Shaves so bookings can be created."
               action={
@@ -105,10 +106,12 @@ export function ServicesManager() {
                   </div>
                   <div className="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400 pt-1">
                     <span className="flex items-center gap-1">
-                      <span aria-hidden="true">⏱️</span> {svc.duration_min} min
+                      <Timer className="h-3.5 w-3.5 text-slate-400" aria-hidden="true" />
+                      <span>{svc.duration_min} min</span>
                     </span>
                     <span className="flex items-center gap-1 font-semibold text-slate-700 dark:text-slate-200">
-                      <span aria-hidden="true">💵</span> ${Number(svc.price).toFixed(2)}
+                      <Banknote className="h-3.5 w-3.5 text-slate-400" aria-hidden="true" />
+                      <span>${Number(svc.price).toFixed(2)}</span>
                     </span>
                   </div>
                 </div>
@@ -117,7 +120,7 @@ export function ServicesManager() {
                   <button
                     type="button"
                     onClick={() => handleOpenEdit(svc)}
-                    className="text-xs font-medium text-brand-600 hover:text-brand-700 dark:text-brand-400 p-1"
+                    className="text-xs font-medium text-brand-600 hover:text-brand-700 dark:text-brand-400 p-1 min-h-[44px] flex items-center"
                   >
                     Edit
                   </button>
@@ -135,7 +138,7 @@ export function ServicesManager() {
                         void toggleActive.mutateAsync({ id: svc.id, is_active: true })
                       }
                     }}
-                    className={`text-xs font-medium p-1 ${
+                    className={`text-xs font-medium p-1 min-h-[44px] flex items-center ${
                       svc.is_active
                         ? 'text-red-600 hover:text-red-700 dark:text-red-400'
                         : 'text-green-600 hover:text-green-700 dark:text-green-400'

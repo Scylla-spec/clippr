@@ -72,7 +72,7 @@ export function CreateBarberModal({
           <Input
             label="Login Email"
             type="email"
-            placeholder="tinashe@clippr.local"
+            placeholder="tinashe@infinitybarbers.local"
             error={errors.email?.message}
             required
             {...register('email')}

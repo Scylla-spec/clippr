@@ -65,7 +65,7 @@ describe('AuthGuard', () => {
     vi.spyOn(useAuthModule, 'useAuth').mockReturnValue({
       user: {
         id: 'user-1',
-        email: 'user@clippr.local',
+        email: 'user@infinitybarbers.local',
         profile: {
           id: 'user-1',
           full_name: 'Test Barber',

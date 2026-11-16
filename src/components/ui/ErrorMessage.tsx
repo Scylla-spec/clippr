@@ -3,6 +3,7 @@
  * For page-level errors, use ErrorPage.
  */
 
+import { TriangleAlert } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface ErrorMessageProps {
@@ -21,9 +22,7 @@ export function ErrorMessage({ message, onRetry, className }: ErrorMessageProps)
         className,
       )}
     >
-      <span className="mt-0.5 text-red-500 dark:text-red-400" aria-hidden="true">
-        ⚠️
-      </span>
+      <TriangleAlert className="mt-0.5 h-5 w-5 shrink-0 text-red-500 dark:text-red-400" aria-hidden="true" />
       <div className="flex-1">
         <p className="text-sm font-medium text-red-700 dark:text-red-300">{message}</p>
         {onRetry && (

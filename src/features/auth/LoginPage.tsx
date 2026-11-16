@@ -2,12 +2,14 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useLocation, Navigate } from 'react-router-dom'
+import { TriangleAlert } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useAuth } from './useAuth'
 import { loginSchema, type LoginFormData } from './auth.schema'
 import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
 import { Card, CardBody } from '@/components/ui/Card'
+import { Logo } from '@/components/brand/Logo'
 
 export default function LoginPage() {
   const { signIn, user, isLoading: isAuthLoading } = useAuth()
@@ -64,13 +66,11 @@ export default function LoginPage() {
     <main className="flex min-h-screen items-center justify-center bg-slate-50 px-4 py-8 dark:bg-surface-900">
       <div className="w-full max-w-md space-y-6">
         <div className="text-center">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-500/10 text-3xl shadow-inner dark:bg-brand-500/20">
-            <span role="img" aria-label="Scissors">
-              ✂️
-            </span>
+          <div className="flex justify-center mb-3">
+            <Logo size={48} showWordmark={false} />
           </div>
-          <h1 className="mt-4 text-2xl font-bold tracking-tight text-surface-900 dark:text-white sm:text-3xl">
-            Clippr
+          <h1 className="text-2xl font-bold tracking-tight text-surface-900 dark:text-white sm:text-3xl">
+            Infinity Barbers
           </h1>
           <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
             Barbershop booking &amp; queue management
@@ -88,9 +88,7 @@ export default function LoginPage() {
                 role="alert"
                 className="mb-6 flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 p-3.5 text-sm text-red-800 dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-300"
               >
-                <span className="text-base" aria-hidden="true">
-                  ⚠️
-                </span>
+                <TriangleAlert className="h-5 w-5 shrink-0 text-red-500 dark:text-red-400" aria-hidden="true" />
                 <p className="flex-1 font-medium">{formError}</p>
               </div>
             )}
@@ -100,7 +98,7 @@ export default function LoginPage() {
                 label="Email address"
                 type="email"
                 autoComplete="email"
-                placeholder="name@clippr.local"
+                placeholder="name@infinitybarbers.local"
                 error={errors.email?.message}
                 required
                 {...register('email')}
@@ -135,12 +133,12 @@ export default function LoginPage() {
               <div className="flex flex-col gap-2">
                 <button
                   type="button"
-                  onClick={() => fillQuickAccount('admin@clippr.local')}
+                  onClick={() => fillQuickAccount('admin@infinitybarbers.local')}
                   className="flex items-center justify-between rounded-lg border border-slate-200 bg-slate-50/50 px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-brand-50 hover:border-brand-300 dark:border-surface-700 dark:bg-surface-800 dark:text-slate-300 dark:hover:bg-surface-700 transition"
                 >
                   <div>
                     <span className="font-semibold text-surface-900 dark:text-white">Shop Admin</span>
-                    <span className="ml-2 text-slate-500 dark:text-slate-400">admin@clippr.local</span>
+                    <span className="ml-2 text-slate-500 dark:text-slate-400">admin@infinitybarbers.local</span>
                   </div>
                   <span className="rounded bg-brand-500/10 px-1.5 py-0.5 font-mono text-[10px] text-brand-600 dark:text-brand-400">
                     admin
@@ -149,12 +147,12 @@ export default function LoginPage() {
 
                 <button
                   type="button"
-                  onClick={() => fillQuickAccount('tendai@clippr.local')}
+                  onClick={() => fillQuickAccount('tendai@infinitybarbers.local')}
                   className="flex items-center justify-between rounded-lg border border-slate-200 bg-slate-50/50 px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-brand-50 hover:border-brand-300 dark:border-surface-700 dark:bg-surface-800 dark:text-slate-300 dark:hover:bg-surface-700 transition"
                 >
                   <div>
                     <span className="font-semibold text-surface-900 dark:text-white">Tendai Moyo</span>
-                    <span className="ml-2 text-slate-500 dark:text-slate-400">tendai@clippr.local</span>
+                    <span className="ml-2 text-slate-500 dark:text-slate-400">tendai@infinitybarbers.local</span>
                   </div>
                   <span className="rounded bg-blue-500/10 px-1.5 py-0.5 font-mono text-[10px] text-blue-600 dark:text-blue-400">
                     barber
@@ -163,12 +161,12 @@ export default function LoginPage() {
 
                 <button
                   type="button"
-                  onClick={() => fillQuickAccount('rudo@clippr.local')}
+                  onClick={() => fillQuickAccount('rudo@infinitybarbers.local')}
                   className="flex items-center justify-between rounded-lg border border-slate-200 bg-slate-50/50 px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-brand-50 hover:border-brand-300 dark:border-surface-700 dark:bg-surface-800 dark:text-slate-300 dark:hover:bg-surface-700 transition"
                 >
                   <div>
                     <span className="font-semibold text-surface-900 dark:text-white">Rudo Chikwanda</span>
-                    <span className="ml-2 text-slate-500 dark:text-slate-400">rudo@clippr.local</span>
+                    <span className="ml-2 text-slate-500 dark:text-slate-400">rudo@infinitybarbers.local</span>
                   </div>
                   <span className="rounded bg-blue-500/10 px-1.5 py-0.5 font-mono text-[10px] text-blue-600 dark:text-blue-400">
                     barber

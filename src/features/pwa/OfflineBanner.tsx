@@ -1,3 +1,4 @@
+import { WifiOff } from 'lucide-react'
 import { useOnlineStatus } from './useOnlineStatus'
 
 export function OfflineBanner() {
@@ -10,9 +11,7 @@ export function OfflineBanner() {
       role="alert"
       className="sticky top-0 z-50 flex items-center justify-center gap-2 bg-amber-500 px-4 py-2.5 text-center text-xs sm:text-sm font-bold text-surface-950 shadow-md animate-in slide-in-from-top duration-200"
     >
-      <span aria-hidden="true" className="text-base">
-        📡
-      </span>
+      <WifiOff className="h-4 w-4 shrink-0" aria-hidden="true" />
       <span>
         You are offline. Showing last loaded queue in read-only mode. Write actions are disabled
         until connection is restored.

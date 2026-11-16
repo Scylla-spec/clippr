@@ -137,7 +137,7 @@ export function useBarberQueue() {
           // Announce change for screen readers via aria-live
           if (payload.eventType === 'INSERT') {
             setLastAnnouncement('New client added to your queue')
-            toast('New client added to queue', { icon: '🔔' })
+            toast('New client added to queue')
           } else if (payload.eventType === 'UPDATE') {
             const newStatus = (payload.new as { status?: string }).status
             setLastAnnouncement(`Booking status updated to ${newStatus ?? ''}`)

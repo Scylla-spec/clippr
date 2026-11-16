@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { format, addDays, subDays } from 'date-fns'
+import { Footprints, CalendarDays, Phone, Scissors, Armchair } from 'lucide-react'
 import {
   useDayBookings,
   useCreateBooking,
@@ -76,9 +77,10 @@ export function DayViewSchedule() {
             variant="secondary"
             size="sm"
             onClick={() => setIsWalkInModalOpen(true)}
-            className="text-xs font-semibold"
+            className="text-xs font-semibold flex items-center gap-1.5"
           >
-            ⚡ Add Walk-in
+            <Footprints className="h-4 w-4" aria-hidden="true" />
+            <span>Add Walk-in</span>
           </Button>
 
           <Button
@@ -167,13 +169,14 @@ export function DayViewSchedule() {
         <Card>
           <CardBody>
             <EmptyState
-              icon="📅"
+              icon={<CalendarDays className="h-10 w-10 text-slate-400" aria-hidden="true" />}
               title="No bookings on this day"
               description="No appointments or walk-in clients scheduled for the selected date."
               action={
                 <div className="flex gap-2">
-                  <Button variant="secondary" size="sm" onClick={() => setIsWalkInModalOpen(true)}>
-                    ⚡ Add Walk-in
+                  <Button variant="secondary" size="sm" onClick={() => setIsWalkInModalOpen(true)} className="flex items-center gap-1.5">
+                    <Footprints className="h-4 w-4" aria-hidden="true" />
+                    <span>Add Walk-in</span>
                   </Button>
                   <Button variant="primary" size="sm" onClick={() => setIsBookingModalOpen(true)}>
                     Book Appointment
@@ -226,11 +229,20 @@ export function DayViewSchedule() {
                       </div>
 
                       <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500 dark:text-slate-400">
-                        <span>📞 {booking.client.phone}</span>
+                        <span className="inline-flex items-center gap-1">
+                          <Phone className="h-3 w-3 text-slate-400" aria-hidden="true" />
+                          <span>{booking.client.phone}</span>
+                        </span>
                         <span>•</span>
-                        <span>💈 {booking.service.name} ({booking.service.duration_min}m)</span>
+                        <span className="inline-flex items-center gap-1">
+                          <Armchair className="h-3 w-3 text-slate-400" aria-hidden="true" />
+                          <span>{booking.service.name} ({booking.service.duration_min}m)</span>
+                        </span>
                         <span>•</span>
-                        <span>✂️ {booking.barber.full_name}</span>
+                        <span className="inline-flex items-center gap-1">
+                          <Scissors className="h-3 w-3 text-slate-400" aria-hidden="true" />
+                          <span>{booking.barber.full_name}</span>
+                        </span>
                         <span>•</span>
                         <span className="font-semibold text-slate-700 dark:text-slate-200">
                           ${Number(booking.service.price).toFixed(2)}

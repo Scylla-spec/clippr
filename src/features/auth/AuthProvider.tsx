@@ -51,7 +51,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = useCallback(async () => {
     try {
-      localStorage.removeItem('clippr_demo_user')
+      localStorage.removeItem('infinity_demo_user')
       await supabase.auth.signOut()
     } catch (err) {
       logger.error('Sign out error', err)
@@ -65,7 +65,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     async ({ email, password }: SignInCredentials): Promise<{ error?: string }> => {
       // Demo fallback helper
       const tryDemoLogin = () => {
-        if (email.endsWith('@clippr.local')) {
+        if (email.endsWith('@infinitybarbers.local')) {
           const role = email.startsWith('admin') ? 'admin' : 'barber'
           const name = email.startsWith('admin')
             ? 'Shop Admin'
@@ -89,7 +89,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               created_at: new Date().toISOString(),
             },
           }
-          localStorage.setItem('clippr_demo_user', JSON.stringify(mockUser))
+          localStorage.setItem('infinity_demo_user', JSON.stringify(mockUser))
           setUser(mockUser)
           return true
         }
@@ -138,7 +138,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     let isMounted = true
 
     // Check demo user in localStorage first
-    const demoUser = localStorage.getItem('clippr_demo_user')
+    const demoUser = localStorage.getItem('infinity_demo_user')
     if (demoUser) {
       try {
         const parsed = JSON.parse(demoUser)

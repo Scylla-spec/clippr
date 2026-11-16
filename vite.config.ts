@@ -10,15 +10,16 @@ export default defineConfig({
     VitePWA({
       registerType: 'prompt', // User prompted when update available
       includeAssets: [
-        'favicon.ico',
+        'icons/icon.svg',
+        'icons/favicon-32x32.png',
         'icons/apple-touch-icon.png',
         'icons/icon-192.png',
         'icons/icon-512.png',
         'icons/icon-512-maskable.png',
       ],
       manifest: {
-        name: 'Clippr — Barbershop Booking & Queue',
-        short_name: 'Clippr',
+        name: 'Infinity Barbers',
+        short_name: 'Infinity',
         description: 'Installable barbershop queue management and booking system',
         start_url: '/',
         scope: '/',
@@ -68,7 +69,7 @@ export default defineConfig({
             urlPattern: /^https:\/\/(fonts\.googleapis\.com|fonts\.gstatic\.com|fonts\.bunny\.net)/i,
             handler: 'StaleWhileRevalidate',
             options: {
-              cacheName: 'clippr-webfonts',
+              cacheName: 'infinity-webfonts',
               expiration: {
                 maxEntries: 20,
                 maxAgeSeconds: 60 * 60 * 24 * 365, // 1 year
@@ -83,7 +84,7 @@ export default defineConfig({
             urlPattern: /^https:\/\/.*\.supabase\.co\/(rest|auth)\/v1\//i,
             handler: 'NetworkFirst',
             options: {
-              cacheName: 'clippr-api-cache',
+              cacheName: 'infinity-api-cache',
               networkTimeoutSeconds: 5,
               expiration: {
                 maxEntries: 50,

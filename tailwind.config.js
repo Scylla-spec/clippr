@@ -5,7 +5,7 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Brand palette — "Clippr" barbershop theme
+        // Brand palette — "Infinity Barbers" theme
         // Primary: warm amber (action, brand)
         brand: {
           50:  '#fffbeb',

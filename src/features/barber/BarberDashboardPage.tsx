@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { RefreshCw, Scissors } from 'lucide-react'
 import { useAuth } from '@/features/auth/useAuth'
 import { useBarberQueue } from './useBarberQueue'
 import type { TodayQueueRow } from '@/lib/database.types'
@@ -65,7 +66,7 @@ export default function BarberDashboardPage() {
   return (
     <div className="space-y-6 max-w-2xl mx-auto pb-12">
       {/* Top Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:between gap-3">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-surface-900 dark:text-white sm:text-3xl">
             My Chair
@@ -84,9 +85,9 @@ export default function BarberDashboardPage() {
             type="button"
             onClick={() => void refetch()}
             aria-label="Refresh queue"
-            className="rounded-lg border border-slate-200 bg-white p-2 text-slate-600 hover:bg-slate-50 dark:border-surface-700 dark:bg-surface-800 dark:text-slate-300 min-h-touch min-w-touch flex items-center justify-center"
+            className="rounded-lg border border-slate-200 bg-white p-2 text-slate-600 hover:bg-slate-50 dark:border-surface-700 dark:bg-surface-800 dark:text-slate-300 min-h-[44px] min-w-[44px] flex items-center justify-center"
           >
-            🔄
+            <RefreshCw className="h-4 w-4" aria-hidden="true" />
           </button>
         </div>
       </div>
@@ -103,7 +104,7 @@ export default function BarberDashboardPage() {
         />
       ) : !hasAnyBookings ? (
         <EmptyState
-          icon="✂️"
+          icon={<Scissors className="h-10 w-10" aria-hidden="true" />}
           title="No bookings assigned today"
           description="Your queue is clear. Walk-ins or appointments booked by the receptionist will appear here live."
           action={

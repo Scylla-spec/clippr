@@ -1,10 +1,10 @@
-# ✂️ Clippr — Barbershop Booking & Queue Management System (Phase 1 MVP)
+# Infinity Barbers — Barbershop Booking & Queue Management System (Phase 1 MVP)
 
 An installable, production-ready Progressive Web App (PWA) designed for modern barbershops. Features unified queue management for appointments and walk-ins, role-based dashboards, PostgreSQL Row Level Security, and Supabase Realtime synchronization. Optimized for mobile and flaky internet connections (Zimbabwe, `Africa/Harare` timezone).
 
 ---
 
-## 🚀 Key Features
+## Key Features
 
 - **Two Distinct Roles**:
   - **Admin / Receptionist**: Day schedule view across all barbers, create appointments, 1-click walk-in queue insertion, manage service catalog (duration, price), and provision/deactivate barber accounts.
@@ -25,7 +25,7 @@ An installable, production-ready Progressive Web App (PWA) designed for modern b
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 | Layer | Technology |
 |---|---|
@@ -42,10 +42,10 @@ An installable, production-ready Progressive Web App (PWA) designed for modern b
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
 ```
-clippr/
+infinity-barbers/
 ├── public/
 │   ├── favicon.ico
 │   ├── manifest.webmanifest      # PWA manifest specification
@@ -94,7 +94,7 @@ clippr/
 
 ---
 
-## 🏃 Local Setup & Development
+## Local Setup & Development
 
 ### 1. Prerequisites
 - **Node.js** 20+ and **pnpm** (or npm)
@@ -104,7 +104,7 @@ clippr/
 ### 2. Install dependencies
 ```bash
 git clone <repo-url>
-cd clippr
+cd infinity-barbers
 pnpm install
 ```
 
@@ -126,9 +126,9 @@ pnpm supabase start
 pnpm supabase db reset
 ```
 This runs all migrations in `supabase/migrations/` and seeds the database with:
-- **Shop Admin**: `admin@clippr.local` (Password: `password123`)
-- **Barber 1**: `tendai@clippr.local` (Password: `password123`)
-- **Barber 2**: `rudo@clippr.local` (Password: `password123`)
+- **Shop Admin**: `admin@infinitybarbers.local` (Password: `password123`)
+- **Barber 1**: `tendai@infinitybarbers.local` (Password: `password123`)
+- **Barber 2**: `rudo@infinitybarbers.local` (Password: `password123`)
 - 4 default services and today's sample bookings.
 
 ### 5. Start the local Edge Function
@@ -144,7 +144,7 @@ Open **`http://localhost:5173`** in your browser.
 
 ---
 
-## 🧪 Testing & Verification
+## Testing & Verification
 
 ### Run Automated Test Suite
 ```bash
@@ -179,7 +179,7 @@ Verify that all 9 tests report **`PASS`**:
 
 ---
 
-## 🚢 Production Deployment
+## Production Deployment
 
 ### 1. Supabase Cloud Setup
 1. Create a project at [supabase.com](https://supabase.com).
@@ -217,7 +217,7 @@ Verify that all 9 tests report **`PASS`**:
 
 ---
 
-## 🔒 Security Model & Best Practices
+## Security Model & Best Practices
 
 - **Zero Client Secrets**: Only `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` are sent to the client. The `SUPABASE_SERVICE_ROLE_KEY` is exclusively accessed inside the Edge Function.
 - **Row Level Security (RLS)**: Enforced directly on PostgreSQL for all 4 tables (`profiles`, `services`, `clients`, `bookings`). UI hiding is never treated as security.
@@ -231,7 +231,7 @@ Verify that all 9 tests report **`PASS`**:
 
 ---
 
-## 📱 PWA & Offline Standards
+## PWA & Offline Standards
 
 - **App Manifest**: Fully compliant with modern PWA criteria (`display: standalone`, `theme_color: #f59e0b`, standard + maskable icons).
 - **Offline Fallback**: TanStack Query's `offlineFirst` mode serves previously loaded queues from disk when connectivity drops.
@@ -240,7 +240,7 @@ Verify that all 9 tests report **`PASS`**:
 
 ---
 
-## ⚠️ Known Phase 1 Limitations
+## Known Phase 1 Limitations
 
 The following capabilities are deliberately excluded from Phase 1 (MVP) per project specifications:
 1. **Client Self-Booking Web Portal**: Clients cannot currently book themselves online; all bookings are entered by the receptionist/admin. (Scheduled for Phase 2).

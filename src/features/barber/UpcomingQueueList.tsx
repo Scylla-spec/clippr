@@ -1,3 +1,4 @@
+import { Clock, Scissors, Phone } from 'lucide-react'
 import type { TodayQueueRow } from '@/lib/database.types'
 import { formatTimeInHarare } from '@/lib/dates'
 import { Card, CardBody } from '@/components/ui/Card'
@@ -43,8 +44,21 @@ export function UpcomingQueueList({ bookings, onNoShow }: UpcomingQueueListProps
                     <StatusBadge status={booking.status} />
                   </div>
 
-                  <p className="text-xs text-slate-500 dark:text-slate-400">
-                    🕒 {formatTimeInHarare(booking.start_time)} • 💈 {booking.service_name} ({booking.duration_min}m) • 📞 {booking.client_phone}
+                  <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                    <span className="inline-flex items-center gap-1">
+                      <Clock className="h-3 w-3 text-slate-400" aria-hidden="true" />
+                      <span>{formatTimeInHarare(booking.start_time)}</span>
+                    </span>
+                    <span>•</span>
+                    <span className="inline-flex items-center gap-1">
+                      <Scissors className="h-3 w-3 text-slate-400" aria-hidden="true" />
+                      <span>{booking.service_name} ({booking.duration_min}m)</span>
+                    </span>
+                    <span>•</span>
+                    <span className="inline-flex items-center gap-1">
+                      <Phone className="h-3 w-3 text-slate-400" aria-hidden="true" />
+                      <span>{booking.client_phone}</span>
+                    </span>
                   </p>
                 </div>
               </div>
@@ -53,7 +67,7 @@ export function UpcomingQueueList({ bookings, onNoShow }: UpcomingQueueListProps
                 <button
                   type="button"
                   onClick={() => onNoShow(booking)}
-                  className="text-xs font-medium text-orange-600 hover:text-orange-700 dark:text-orange-400 p-2 min-h-touch"
+                  className="text-xs font-medium text-orange-600 hover:text-orange-700 dark:text-orange-400 p-2 min-h-[44px] min-w-[44px] flex items-center justify-center"
                 >
                   No-show
                 </button>

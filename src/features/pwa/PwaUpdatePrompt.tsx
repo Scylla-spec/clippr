@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { RefreshCw } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 
 export function PwaUpdatePrompt() {
@@ -58,9 +59,7 @@ export function PwaUpdatePrompt() {
     >
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2">
-          <span className="text-xl" aria-hidden="true">
-            🔄
-          </span>
+          <RefreshCw className="h-5 w-5 text-brand-400" aria-hidden="true" />
           <span className="text-xs font-semibold">New version available</span>
         </div>
 

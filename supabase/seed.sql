@@ -12,9 +12,9 @@
 --   pnpm supabase db reset     ← wipes and re-runs all migrations + this seed
 --
 -- USERS CREATED (password: "password123" for all — local dev only):
---   admin@clippr.local   → admin role
---   tendai@clippr.local  → barber role
---   rudo@clippr.local    → barber role
+--   admin@infinitybarbers.local   → admin role
+--   tendai@infinitybarbers.local  → barber role
+--   rudo@infinitybarbers.local    → barber role
 --
 -- WARNING: Never run this against a production database.
 -- =============================================================================
@@ -58,7 +58,7 @@ BEGIN
     v_admin_id,
     '00000000-0000-0000-0000-000000000000',
     'authenticated', 'authenticated',
-    'admin@clippr.local',
+    'admin@infinitybarbers.local',
     crypt('password123', gen_salt('bf')),
     now(), now(), now(),
     '{"full_name": "Shop Admin", "role": "admin"}'::jsonb,
@@ -69,7 +69,7 @@ BEGIN
     v_barber1,
     '00000000-0000-0000-0000-000000000000',
     'authenticated', 'authenticated',
-    'tendai@clippr.local',
+    'tendai@infinitybarbers.local',
     crypt('password123', gen_salt('bf')),
     now(), now(), now(),
     '{"full_name": "Tendai Moyo", "role": "barber"}'::jsonb,
@@ -80,7 +80,7 @@ BEGIN
     v_barber2,
     '00000000-0000-0000-0000-000000000000',
     'authenticated', 'authenticated',
-    'rudo@clippr.local',
+    'rudo@infinitybarbers.local',
     crypt('password123', gen_salt('bf')),
     now(), now(), now(),
     '{"full_name": "Rudo Chikwanda", "role": "barber"}'::jsonb,

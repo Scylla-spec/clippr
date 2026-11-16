@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { CalendarDays, Armchair, Scissors } from 'lucide-react'
 import { DayViewSchedule } from '@/features/bookings/DayViewSchedule'
 import { ServicesManager } from '@/features/services/ServicesManager'
 import { BarbersManager } from '@/features/barbers/BarbersManager'
@@ -30,35 +31,38 @@ export default function AdminDashboardPage() {
           <button
             type="button"
             onClick={() => setActiveTab('schedule')}
-            className={`pb-3 text-sm font-medium border-b-2 transition-colors ${
+            className={`inline-flex min-h-[44px] items-center gap-2 border-b-2 pb-3 text-sm font-medium transition-colors ${
               activeTab === 'schedule'
                 ? 'border-brand-500 text-brand-600 dark:text-brand-400'
                 : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 dark:text-slate-400 dark:hover:text-slate-200'
             }`}
           >
-            📅 Schedule (Day View)
+            <CalendarDays className="h-4 w-4" aria-hidden="true" />
+            <span>Schedule (Day View)</span>
           </button>
           <button
             type="button"
             onClick={() => setActiveTab('services')}
-            className={`pb-3 text-sm font-medium border-b-2 transition-colors ${
+            className={`inline-flex min-h-[44px] items-center gap-2 border-b-2 pb-3 text-sm font-medium transition-colors ${
               activeTab === 'services'
                 ? 'border-brand-500 text-brand-600 dark:text-brand-400'
                 : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 dark:text-slate-400 dark:hover:text-slate-200'
             }`}
           >
-            💈 Services ({services?.length ?? 0})
+            <Armchair className="h-4 w-4" aria-hidden="true" />
+            <span>Services ({services?.length ?? 0})</span>
           </button>
           <button
             type="button"
             onClick={() => setActiveTab('barbers')}
-            className={`pb-3 text-sm font-medium border-b-2 transition-colors ${
+            className={`inline-flex min-h-[44px] items-center gap-2 border-b-2 pb-3 text-sm font-medium transition-colors ${
               activeTab === 'barbers'
                 ? 'border-brand-500 text-brand-600 dark:text-brand-400'
                 : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 dark:text-slate-400 dark:hover:text-slate-200'
             }`}
           >
-            ✂️ Barbers ({barbers?.length ?? 0})
+            <Scissors className="h-4 w-4" aria-hidden="true" />
+            <span>Barbers ({barbers?.length ?? 0})</span>
           </button>
         </nav>
       </div>

@@ -4,13 +4,13 @@ import { loginSchema } from '@/features/auth/auth.schema'
 describe('loginSchema', () => {
   it('validates a correct email and password', () => {
     const result = loginSchema.safeParse({
-      email: 'Admin@Clippr.local',
+      email: 'Admin@InfinityBarbers.local',
       password: 'password123',
     })
 
     expect(result.success).toBe(true)
     if (result.success) {
-      expect(result.data.email).toBe('admin@clippr.local') // lowercase transform
+      expect(result.data.email).toBe('admin@infinitybarbers.local') // lowercase transform
       expect(result.data.password).toBe('password123')
     }
   })
@@ -29,7 +29,7 @@ describe('loginSchema', () => {
 
   it('rejects short passwords (< 6 characters)', () => {
     const result = loginSchema.safeParse({
-      email: 'admin@clippr.local',
+      email: 'admin@infinitybarbers.local',
       password: '12345',
     })
 

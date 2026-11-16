@@ -63,7 +63,7 @@ describe('BarberDashboardPage', () => {
     vi.spyOn(authHook, 'useAuth').mockReturnValue({
       user: {
         id: 'barber-1',
-        email: 'tendai@clippr.local',
+        email: 'tendai@infinitybarbers.local',
         profile: {
           id: 'barber-1',
           full_name: 'Tendai Moyo',

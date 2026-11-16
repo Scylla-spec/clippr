@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Scissors } from 'lucide-react'
 import { useBarbers, useCreateBarber, useToggleBarberActive } from './useBarbers'
 import type { Profile } from '@/lib/database.types'
 import type { CreateBarberFormData } from './barber.schema'
@@ -49,7 +50,7 @@ export function BarbersManager() {
         <Card>
           <CardBody>
             <EmptyState
-              icon="💈"
+              icon={<Scissors className="h-10 w-10 text-slate-400" aria-hidden="true" />}
               title="No barbers added"
               description="Add barbers to your shop so appointments and walk-in queues can be assigned."
               action={
