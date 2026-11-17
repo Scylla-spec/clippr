@@ -60,7 +60,7 @@ export default defineConfig({
         ],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        globPatterns: ['**/*.{js,css,html,png,svg,woff2}'],
         navigateFallback: '/index.html',
         // Runtime caching rules
         runtimeCaching: [
@@ -80,15 +80,17 @@ export default defineConfig({
             },
           },
           {
-            // Supabase API calls: NetworkFirst to prevent stale or cross-user data leakage
-            urlPattern: /^https:\/\/.*\.supabase\.co\/(rest|auth)\/v1\//i,
+            // Supabase REST calls only (GET requests): NetworkFirst with short expiry (5 minutes)
+            // Auth endpoints (/auth/v1/) are excluded entirely to protect user credentials and session tokens
+            urlPattern: /^https:\/\/.*\.supabase\.co\/rest\/v1\//i,
             handler: 'NetworkFirst',
+            method: 'GET',
             options: {
               cacheName: 'infinity-api-cache',
-              networkTimeoutSeconds: 5,
+              networkTimeoutSeconds: 4,
               expiration: {
                 maxEntries: 50,
-                maxAgeSeconds: 60 * 10, // 10 minutes max for offline fallback
+                maxAgeSeconds: 60 * 5, // 5 minutes max for offline fallback
               },
               cacheableResponse: {
                 statuses: [0, 200],
@@ -98,7 +100,9 @@ export default defineConfig({
         ],
       },
       devOptions: {
-        enabled: true,
+        // Disabled by default for normal development.
+        // Set to true temporarily to test or debug Service Worker lifecycle and offline caching locally.
+        enabled: false,
       },
     }),
   ],

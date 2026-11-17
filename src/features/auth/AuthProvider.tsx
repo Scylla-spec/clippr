@@ -1,9 +1,10 @@
-import { type ReactNode, useCallback, useEffect, useState } from 'react'
+import { type ReactNode, useCallback, useEffect, useRef, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import type { Session } from '@supabase/supabase-js'
 import toast from 'react-hot-toast'
 import { supabase } from '@/lib/supabase'
 import { logger } from '@/lib/logger'
+import { clearRuntimeCaches } from '@/lib/cache'
 import type { AuthUser, SignInCredentials, UserProfile } from './auth.types'
 import { AuthContext } from './useAuth'
 
@@ -42,15 +43,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const queryClient = useQueryClient()
   const [user, setUser] = useState<AuthUser | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const currentUserIdRef = useRef<string | null>(null)
 
-  const clearAuthCache = useCallback(async () => {
+  const clearAllCaches = useCallback(async () => {
     try {
       await queryClient.resetQueries()
       queryClient.clear()
     } catch (e) {
       logger.error('Failed to clear query cache', e)
     }
+    await clearRuntimeCaches()
   }, [queryClient])
+
+  const handleUserIdChange = useCallback(
+    async (newUserId: string | null) => {
+      if (currentUserIdRef.current !== null && currentUserIdRef.current !== newUserId) {
+        await clearAllCaches()
+      }
+      currentUserIdRef.current = newUserId
+    },
+    [clearAllCaches],
+  )
 
   const signOut = useCallback(async () => {
     try {
@@ -59,9 +72,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       logger.error('Sign out error', err)
     } finally {
       setUser(null)
-      await clearAuthCache()
+      currentUserIdRef.current = null
+      await clearAllCaches()
     }
-  }, [clearAuthCache])
+  }, [clearAllCaches])
 
   const signIn = useCallback(
     async ({ email, password }: SignInCredentials): Promise<{ error?: string }> => {
@@ -84,10 +98,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         if (!profile || !profile.is_active) {
           await supabase.auth.signOut()
+          currentUserIdRef.current = null
+          await clearAllCaches()
           return { error: INACTIVE_OR_MISSING_PROFILE_MSG }
         }
 
         if (data.session) {
+          await handleUserIdChange(data.session.user.id)
           setUser(sessionToAuthUser(data.session, profile))
         }
 
@@ -97,7 +114,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return { error: msg }
       }
     },
-    [],
+    [clearAllCaches, handleUserIdChange],
   )
 
   useEffect(() => {
@@ -115,12 +132,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           toast.error(INACTIVE_OR_MISSING_PROFILE_MSG)
           await supabase.auth.signOut()
           setUser(null)
-          await clearAuthCache()
+          currentUserIdRef.current = null
+          await clearAllCaches()
         } else {
+          await handleUserIdChange(session.user.id)
           setUser(sessionToAuthUser(session, profile))
         }
       } else {
         setUser(null)
+        await handleUserIdChange(null)
       }
       setIsLoading(false)
     })
@@ -134,7 +154,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (event === 'SIGNED_OUT' || !session) {
         if (isMounted) {
           setUser(null)
-          await clearAuthCache()
+          currentUserIdRef.current = null
+          await clearAllCaches()
           setIsLoading(false)
         }
         return
@@ -148,8 +169,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           toast.error(INACTIVE_OR_MISSING_PROFILE_MSG)
           await supabase.auth.signOut()
           setUser(null)
-          await clearAuthCache()
+          currentUserIdRef.current = null
+          await clearAllCaches()
         } else {
+          await handleUserIdChange(session.user.id)
           setUser(sessionToAuthUser(session, profile))
         }
         setIsLoading(false)
@@ -160,7 +183,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isMounted = false
       subscription.unsubscribe()
     }
-  }, [clearAuthCache])
+  }, [clearAllCaches, handleUserIdChange])
 
   return (
     <AuthContext.Provider value={{ user, isLoading, signIn, signOut }}>
