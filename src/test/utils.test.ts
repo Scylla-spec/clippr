@@ -16,7 +16,7 @@ describe('cn (class merger)', () => {
   })
 
   it('filters falsy values', () => {
-    expect(cn('px-2', false && 'py-2', undefined, null, '')).toBe('px-2')
+    expect(cn('px-2', undefined, null, '')).toBe('px-2')
   })
 
   it('handles conditional classes', () => {

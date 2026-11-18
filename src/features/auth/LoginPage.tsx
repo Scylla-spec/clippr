@@ -20,7 +20,6 @@ export default function LoginPage() {
   const {
     register,
     handleSubmit,
-    setValue,
     formState: { errors },
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -54,12 +53,6 @@ export default function LoginPage() {
       toast.success('Welcome back!')
       // Redirect will be triggered by react router when user state updates
     }
-  }
-
-  const fillQuickAccount = (email: string) => {
-    setValue('email', email, { shouldValidate: true })
-    setValue('password', 'password123', { shouldValidate: true })
-    setFormError(null)
   }
 
   return (
@@ -98,7 +91,7 @@ export default function LoginPage() {
                 label="Email address"
                 type="email"
                 autoComplete="email"
-                placeholder="name@infinitybarbers.local"
+                placeholder="you@example.com"
                 error={errors.email?.message}
                 required
                 {...register('email')}
@@ -124,56 +117,6 @@ export default function LoginPage() {
                 Sign in
               </Button>
             </form>
-
-            {/* Quick-fill helper for development & testing */}
-            <div className="mt-8 border-t border-slate-200 pt-6 dark:border-surface-700">
-              <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-                Quick test accounts (seed data)
-              </p>
-              <div className="flex flex-col gap-2">
-                <button
-                  type="button"
-                  onClick={() => fillQuickAccount('admin@infinitybarbers.local')}
-                  className="flex items-center justify-between rounded-lg border border-slate-200 bg-slate-50/50 px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-brand-50 hover:border-brand-300 dark:border-surface-700 dark:bg-surface-800 dark:text-slate-300 dark:hover:bg-surface-700 transition"
-                >
-                  <div>
-                    <span className="font-semibold text-surface-900 dark:text-white">Shop Admin</span>
-                    <span className="ml-2 text-slate-500 dark:text-slate-400">admin@infinitybarbers.local</span>
-                  </div>
-                  <span className="rounded bg-brand-500/10 px-1.5 py-0.5 font-mono text-[10px] text-brand-600 dark:text-brand-400">
-                    admin
-                  </span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => fillQuickAccount('tendai@infinitybarbers.local')}
-                  className="flex items-center justify-between rounded-lg border border-slate-200 bg-slate-50/50 px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-brand-50 hover:border-brand-300 dark:border-surface-700 dark:bg-surface-800 dark:text-slate-300 dark:hover:bg-surface-700 transition"
-                >
-                  <div>
-                    <span className="font-semibold text-surface-900 dark:text-white">Tendai Moyo</span>
-                    <span className="ml-2 text-slate-500 dark:text-slate-400">tendai@infinitybarbers.local</span>
-                  </div>
-                  <span className="rounded bg-blue-500/10 px-1.5 py-0.5 font-mono text-[10px] text-blue-600 dark:text-blue-400">
-                    barber
-                  </span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => fillQuickAccount('rudo@infinitybarbers.local')}
-                  className="flex items-center justify-between rounded-lg border border-slate-200 bg-slate-50/50 px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-brand-50 hover:border-brand-300 dark:border-surface-700 dark:bg-surface-800 dark:text-slate-300 dark:hover:bg-surface-700 transition"
-                >
-                  <div>
-                    <span className="font-semibold text-surface-900 dark:text-white">Rudo Chikwanda</span>
-                    <span className="ml-2 text-slate-500 dark:text-slate-400">rudo@infinitybarbers.local</span>
-                  </div>
-                  <span className="rounded bg-blue-500/10 px-1.5 py-0.5 font-mono text-[10px] text-blue-600 dark:text-blue-400">
-                    barber
-                  </span>
-                </button>
-              </div>
-            </div>
           </CardBody>
         </Card>
       </div>

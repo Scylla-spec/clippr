@@ -35,12 +35,12 @@ describe('CreateBookingModal', () => {
     vi.spyOn(servicesHook, 'useServices').mockReturnValue({
       data: mockServices,
       isLoading: false,
-    } as any)
+    } as unknown as ReturnType<typeof servicesHook.useServices>)
 
     vi.spyOn(barbersHook, 'useBarbers').mockReturnValue({
       data: mockBarbers,
       isLoading: false,
-    } as any)
+    } as unknown as ReturnType<typeof barbersHook.useBarbers>)
   })
 
   it('renders nothing when isOpen is false', () => {

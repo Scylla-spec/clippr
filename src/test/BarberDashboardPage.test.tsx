@@ -86,7 +86,7 @@ describe('BarberDashboardPage', () => {
       lastAnnouncement: '',
       updateStatus: mockUpdateStatus,
       isUpdating: false,
-    } as any)
+    } as unknown as ReturnType<typeof queueHook.useBarberQueue>)
   })
 
   it('renders barber chair title and barber name', () => {

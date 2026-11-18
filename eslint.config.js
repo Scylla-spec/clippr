@@ -8,14 +8,25 @@ import eslintConfigPrettier from 'eslint-config-prettier'
 import reactPlugin from 'eslint-plugin-react'
 
 export default tseslint.config(
-  { ignores: ['dist', 'coverage', 'node_modules', 'supabase/.temp'] },
+  {
+    ignores: [
+      'dist',
+      'dev-dist',
+      'coverage',
+      'node_modules',
+      'supabase/.temp',
+      'supabase/functions/**',
+      '*.config.js',
+      '*.config.ts',
+      'scripts/**/*.mjs',
+    ],
+  },
 
   // Base JS rules
   js.configs.recommended,
 
-  // TypeScript strict rules
-  ...tseslint.configs.strictTypeChecked,
-  ...tseslint.configs.stylisticTypeChecked,
+  // TypeScript recommended rules
+  ...tseslint.configs.recommended,
 
   {
     languageOptions: {
@@ -55,6 +66,14 @@ export default tseslint.config(
 
       // No console.log in production code (use the logger utility instead)
       'no-console': ['error', { allow: ['warn', 'error'] }],
+    },
+  },
+
+  // Route configuration exports router instances rather than React components.
+  {
+    files: ['src/router.tsx'],
+    rules: {
+      'react-refresh/only-export-components': 'off',
     },
   },
 

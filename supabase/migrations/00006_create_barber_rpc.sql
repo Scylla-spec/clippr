@@ -16,26 +16,22 @@ DECLARE
   v_new_id uuid := gen_random_uuid();
   v_profile jsonb;
 BEGIN
-  -- 1. Ensure caller is an active administrator
   IF public.auth_role() != 'admin' THEN
     RAISE EXCEPTION 'Forbidden: only active administrators can create barbers';
   END IF;
 
-  -- 2. Validate parameters
   IF new_email IS NULL OR new_password IS NULL OR new_full_name IS NULL THEN
     RAISE EXCEPTION 'email, password, and full_name are required';
   END IF;
 
-  IF length(new_password) < 6 THEN
-    RAISE EXCEPTION 'Password must be at least 6 characters';
+  IF length(new_password) < 8 THEN
+    RAISE EXCEPTION 'Password must be at least 8 characters';
   END IF;
 
-  -- 3. Check for existing user
   IF EXISTS (SELECT 1 FROM auth.users WHERE email = lower(trim(new_email))) THEN
     RAISE EXCEPTION 'A user with this email already exists';
   END IF;
 
-  -- 4. Create user in auth.users
   INSERT INTO auth.users (
     id,
     instance_id,
@@ -68,7 +64,6 @@ BEGIN
     false, '', '', '', ''
   );
 
-  -- 5. Insert into public.profiles
   INSERT INTO public.profiles (id, full_name, role, is_active)
   VALUES (v_new_id, trim(new_full_name), 'barber', true)
   ON CONFLICT (id) DO UPDATE SET
@@ -76,13 +71,12 @@ BEGIN
     role = 'barber',
     is_active = true;
 
-  -- 6. Return created profile as JSON
   SELECT to_jsonb(p) INTO v_profile FROM public.profiles p WHERE p.id = v_new_id;
   RETURN v_profile;
 END;
 $$;
 
--- Overload matching alternate parameter order
+-- Alternate parameter order used by older clients.
 CREATE OR REPLACE FUNCTION public.create_barber(
   new_email text,
   new_password text,
@@ -99,5 +93,4 @@ END;
 $$;
 
 GRANT EXECUTE ON FUNCTION public.create_barber(text, text, text) TO authenticated;
-GRANT EXECUTE ON FUNCTION public.create_barber(text, text, text) TO anon;
 NOTIFY pgrst, 'reload schema';

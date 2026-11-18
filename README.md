@@ -38,7 +38,7 @@ An installable, production-ready Progressive Web App (PWA) designed for modern b
 | **Serverless Computing** | Supabase Edge Functions (Deno + Service Role Key security) |
 | **Service Worker & PWA** | `vite-plugin-pwa` + Workbox |
 | **Time & Date Handling** | `date-fns` + `date-fns-tz` (stored in UTC, displayed in `Africa/Harare`) |
-| **Testing** | Vitest + React Testing Library (71 automated unit & component tests) |
+| **Testing** | Vitest + React Testing Library (automated unit & component tests) |
 
 ---
 
@@ -69,7 +69,7 @@ infinity-barbers/
 │   │   ├── phone.ts              # Phone normalisation (+263 E.164)
 │   │   ├── constants.ts          # App configuration constants
 │   │   └── utils.ts              # cn() Tailwind merger
-│   ├── test/                     # 71 unit and component tests
+│   ├── test/                     # Unit and component test suite
 │   ├── App.tsx                   # QueryClient + PWA banners + Providers
 │   ├── router.tsx                # Role-guarded route definitions
 │   └── index.css                 # Base Tailwind styling & focus rings
@@ -181,6 +181,20 @@ Verify that all 9 tests report **`PASS`**:
 ---
 
 ## Production Deployment
+
+Never run `supabase/seed.sql` against a production database. Create the first administrator in the Supabase Dashboard, then promote that auth user from the SQL Editor:
+
+```sql
+update public.profiles
+set role = 'admin', is_active = true
+where id = (
+  select id
+  from auth.users
+  where email = 'admin@infinitybarbers.local'
+);
+```
+
+Turn off public signups in Supabase Authentication settings before deploying.
 
 ### 1. Supabase Cloud Setup
 1. Create a project at [supabase.com](https://supabase.com).

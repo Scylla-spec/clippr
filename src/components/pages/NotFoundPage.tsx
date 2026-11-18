@@ -11,7 +11,7 @@ export default function NotFoundPage() {
       <SearchX className="h-16 w-16 text-slate-400 dark:text-slate-500" aria-hidden="true" />
       <h1 className="text-2xl font-bold text-surface-900 dark:text-white">Page not found</h1>
       <p className="text-slate-500 dark:text-slate-400">
-        The page you're looking for doesn't exist.
+        The page you&apos;re looking for doesn&apos;t exist.
       </p>
       <Link
         to="/"

@@ -39,7 +39,7 @@ export function PwaInstallBanner() {
             <p className="text-xs text-slate-300">
               To install on iPhone/iPad: tap the <strong>Share</strong> button (
               <Share className="inline h-3.5 w-3.5 align-text-bottom" aria-hidden="true" />) in Safari, then tap{' '}
-              <strong>'Add to Home Screen'</strong>.
+              <strong>&apos;Add to Home Screen&apos;</strong>.
             </p>
           )}
 

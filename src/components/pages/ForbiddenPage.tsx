@@ -21,7 +21,7 @@ export default function ForbiddenPage() {
       <ShieldX className="h-16 w-16 text-rose-500" aria-hidden="true" />
       <h1 className="text-2xl font-bold text-surface-900 dark:text-white">Access denied</h1>
       <p className="max-w-sm text-slate-500 dark:text-slate-400">
-        You don't have permission to view this page. If you think this is an error, contact your
+        You don&apos;t have permission to view this page. If you think this is an error, contact your
         administrator.
       </p>
       <Button variant="secondary" onClick={() => void handleSignOut()}>
