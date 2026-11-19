@@ -44,6 +44,19 @@ describe('createBookingSchema', () => {
 
     expect(result.success).toBe(false)
   })
+
+  it('rejects impossible calendar dates', () => {
+    const result = createBookingSchema.safeParse({
+      clientName: 'Farai Mutasa',
+      clientPhone: '0771234567',
+      barberId: '00000000-0000-0000-0000-000000000002',
+      serviceId: '10000000-0000-0000-0000-000000000001',
+      bookingDate: '2026-02-30',
+      bookingTime: '10:30',
+    })
+
+    expect(result.success).toBe(false)
+  })
 })
 
 describe('walkInSchema', () => {

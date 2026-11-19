@@ -9,26 +9,49 @@ export const BARBERS_QUERY_KEY = ['barbers'] as const
 /**
  * Maps edge function error responses to friendly user messages.
  */
-function mapCreateBarberError(err: unknown): string {
+async function mapCreateBarberError(err: unknown): Promise<string> {
   if (err instanceof Error) {
     const msg = err.message
-    const lower = msg.toLowerCase()
-
-    if (lower.includes('failed to send a request') || lower.includes('failed to fetch')) {
-      return 'Unable to reach the server. Please verify the create-barber Edge Function is deployed.'
+    if ('context' in err && err.context instanceof Response) {
+      try {
+        const responseBody: unknown = await err.context.clone().json()
+        if (
+          responseBody !== null &&
+          typeof responseBody === 'object' &&
+          'error' in responseBody &&
+          typeof responseBody.error === 'string'
+        ) {
+          return mapCreateBarberMessage(responseBody.error)
+        }
+      } catch {
+        // Fall back to the SDK error when the response is not JSON.
+      }
     }
-    if (lower.includes('already registered') || lower.includes('already exists') || lower.includes('duplicate')) {
-      return 'A barber account with this email address already exists.'
-    }
-    if (lower.includes('forbidden') || lower.includes('administrator') || lower.includes('403')) {
-      return 'Permission denied: Only active administrators can add barbers.'
-    }
-    if (lower.includes('unauthorized') || lower.includes('token') || lower.includes('401')) {
-      return 'Your session has expired. Please sign in again.'
-    }
-    return msg
+    return mapCreateBarberMessage(msg)
   }
   return 'Failed to create barber account. Please try again.'
+}
+
+function mapCreateBarberMessage(msg: string): string {
+  const lower = msg.toLowerCase()
+
+  if (lower.includes('failed to send a request') || lower.includes('failed to fetch')) {
+    return 'Unable to reach the server. Please verify the create-barber Edge Function is deployed.'
+  }
+  if (
+    lower.includes('already registered') ||
+    lower.includes('already exists') ||
+    lower.includes('duplicate')
+  ) {
+    return 'A barber account with this email address already exists.'
+  }
+  if (lower.includes('forbidden') || lower.includes('administrator') || lower.includes('403')) {
+    return 'Permission denied: Only active administrators can add barbers.'
+  }
+  if (lower.includes('unauthorized') || lower.includes('token') || lower.includes('401')) {
+    return 'Your session has expired. Please sign in again.'
+  }
+  return msg
 }
 
 /**
@@ -64,12 +87,12 @@ export function useCreateBarber() {
       })
 
       if (error) {
-        throw new Error(mapCreateBarberError(error))
+        throw new Error(await mapCreateBarberError(error))
       }
 
       if (data && typeof data === 'object' && 'error' in data) {
         const serverError = new Error(String((data as { error: unknown }).error))
-        throw new Error(mapCreateBarberError(serverError))
+        throw new Error(await mapCreateBarberError(serverError))
       }
 
       return data

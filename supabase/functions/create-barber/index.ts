@@ -19,7 +19,7 @@ function getCorsHeaders(req: Request): Record<string, string> {
   const headers: Record<string, string> = {
     'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Vary': 'Origin',
+    Vary: 'Origin',
   }
 
   // If ALLOWED_ORIGINS is empty (dev) or origin matches the allowlist, reflect it
@@ -90,11 +90,19 @@ Deno.serve(async (req: Request) => {
       .eq('id', callerUser.id)
       .single()
 
-    if (profileCheckError || !callerProfile || callerProfile.role !== 'admin' || !callerProfile.is_active) {
-      return new Response(JSON.stringify({ error: 'Forbidden: caller must be an active administrator' }), {
-        status: 403,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      })
+    if (
+      profileCheckError ||
+      !callerProfile ||
+      callerProfile.role !== 'admin' ||
+      !callerProfile.is_active
+    ) {
+      return new Response(
+        JSON.stringify({ error: 'Forbidden: caller must be an active administrator' }),
+        {
+          status: 403,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        },
+      )
     }
 
     // 2. Parse and validate body
@@ -110,7 +118,12 @@ Deno.serve(async (req: Request) => {
 
     const { email, password, fullName } = body
 
-    if (!email || typeof email !== 'string' || !EMAIL_REGEX.test(email.trim()) || email.trim().length > 255) {
+    if (
+      !email ||
+      typeof email !== 'string' ||
+      !EMAIL_REGEX.test(email.trim()) ||
+      email.trim().length > 255
+    ) {
       return new Response(
         JSON.stringify({ error: 'A valid email address under 255 characters is required' }),
         {
@@ -120,7 +133,12 @@ Deno.serve(async (req: Request) => {
       )
     }
 
-    if (!fullName || typeof fullName !== 'string' || fullName.trim().length < 1 || fullName.trim().length > 100) {
+    if (
+      !fullName ||
+      typeof fullName !== 'string' ||
+      fullName.trim().length < 1 ||
+      fullName.trim().length > 100
+    ) {
       return new Response(
         JSON.stringify({ error: 'Full name must be between 1 and 100 characters' }),
         {
@@ -158,11 +176,18 @@ Deno.serve(async (req: Request) => {
 
     if (createError || !createdAuth.user) {
       const errMsg = createError?.message ?? ''
-      if (errMsg.toLowerCase().includes('already') || errMsg.toLowerCase().includes('registered') || errMsg.toLowerCase().includes('exists')) {
-        return new Response(JSON.stringify({ error: 'A user with this email address already exists' }), {
-          status: 400,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        })
+      if (
+        errMsg.toLowerCase().includes('already') ||
+        errMsg.toLowerCase().includes('registered') ||
+        errMsg.toLowerCase().includes('exists')
+      ) {
+        return new Response(
+          JSON.stringify({ error: 'A user with this email address already exists' }),
+          {
+            status: 400,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          },
+        )
       }
 
       console.error('Failed to create auth user:', createError)
@@ -186,6 +211,10 @@ Deno.serve(async (req: Request) => {
 
     if (upsertError) {
       console.error('Failed to upsert barber profile:', upsertError)
+      const { error: cleanupError } = await adminClient.auth.admin.deleteUser(createdAuth.user.id)
+      if (cleanupError) {
+        console.error('Failed to clean up auth user after profile creation failed:', cleanupError)
+      }
       return new Response(JSON.stringify({ error: 'Failed to create barber profile' }), {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

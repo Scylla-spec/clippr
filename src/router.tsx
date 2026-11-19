@@ -9,8 +9,53 @@ import { RootRedirect } from '@/features/auth/RootRedirect'
 const LoginPage = lazy(() => import('@/features/auth/LoginPage'))
 const AdminLayout = lazy(() => import('@/features/admin/AdminLayout'))
 const AdminDashboardPage = lazy(() => import('@/features/admin/AdminDashboardPage'))
+const AdminAppointmentsPage = lazy(() =>
+  import('@/features/admin/AdminFeaturePages').then((module) => ({
+    default: module.AdminAppointmentsPage,
+  })),
+)
+const AdminWalkInsPage = lazy(() =>
+  import('@/features/admin/AdminFeaturePages').then((module) => ({
+    default: module.AdminWalkInsPage,
+  })),
+)
+const AdminCustomersPage = lazy(() =>
+  import('@/features/admin/AdminFeaturePages').then((module) => ({
+    default: module.AdminCustomersPage,
+  })),
+)
+const AdminBarbersPage = lazy(() =>
+  import('@/features/admin/AdminFeaturePages').then((module) => ({
+    default: module.AdminBarbersPage,
+  })),
+)
+const AdminServicesPage = lazy(() =>
+  import('@/features/admin/AdminFeaturePages').then((module) => ({
+    default: module.AdminServicesPage,
+  })),
+)
+const AdminReportsPage = lazy(() =>
+  import('@/features/admin/AdminFeaturePages').then((module) => ({
+    default: module.AdminReportsPage,
+  })),
+)
+const AdminSettingsPage = lazy(() =>
+  import('@/features/account/AccountSettingsPage').then((module) => ({
+    default: module.AccountSettingsPage,
+  })),
+)
 const BarberLayout = lazy(() => import('@/features/barber/BarberLayout'))
 const BarberDashboardPage = lazy(() => import('@/features/barber/BarberDashboardPage'))
+const BarberHistoryPage = lazy(() =>
+  import('@/features/barber/BarberHistoryPage').then((module) => ({
+    default: module.BarberHistoryPage,
+  })),
+)
+const BarberAccountPage = lazy(() =>
+  import('@/features/account/AccountSettingsPage').then((module) => ({
+    default: module.BarberAccountPage,
+  })),
+)
 const NotFoundPage = lazy(() => import('@/components/pages/NotFoundPage'))
 const ForbiddenPage = lazy(() => import('@/components/pages/ForbiddenPage'))
 
@@ -57,6 +102,62 @@ export const router = createBrowserRouter([
           </Lazy>
         ),
       },
+      {
+        path: 'appointments',
+        element: (
+          <Lazy>
+            <AdminAppointmentsPage />
+          </Lazy>
+        ),
+      },
+      {
+        path: 'walk-ins',
+        element: (
+          <Lazy>
+            <AdminWalkInsPage />
+          </Lazy>
+        ),
+      },
+      {
+        path: 'customers',
+        element: (
+          <Lazy>
+            <AdminCustomersPage />
+          </Lazy>
+        ),
+      },
+      {
+        path: 'barbers',
+        element: (
+          <Lazy>
+            <AdminBarbersPage />
+          </Lazy>
+        ),
+      },
+      {
+        path: 'services',
+        element: (
+          <Lazy>
+            <AdminServicesPage />
+          </Lazy>
+        ),
+      },
+      {
+        path: 'reports',
+        element: (
+          <Lazy>
+            <AdminReportsPage />
+          </Lazy>
+        ),
+      },
+      {
+        path: 'settings',
+        element: (
+          <Lazy>
+            <AdminSettingsPage />
+          </Lazy>
+        ),
+      },
     ],
   },
 
@@ -79,6 +180,22 @@ export const router = createBrowserRouter([
         element: (
           <Lazy>
             <BarberDashboardPage />
+          </Lazy>
+        ),
+      },
+      {
+        path: 'history',
+        element: (
+          <Lazy>
+            <BarberHistoryPage />
+          </Lazy>
+        ),
+      },
+      {
+        path: 'account',
+        element: (
+          <Lazy>
+            <BarberAccountPage />
           </Lazy>
         ),
       },

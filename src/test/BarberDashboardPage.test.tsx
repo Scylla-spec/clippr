@@ -75,6 +75,7 @@ describe('BarberDashboardPage', () => {
       isLoading: false,
       signIn: vi.fn(),
       signOut: vi.fn(),
+      refreshProfile: vi.fn(),
     })
 
     vi.spyOn(queueHook, 'useBarberQueue').mockReturnValue({

@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils'
 export interface LogoProps {
   size?: number | string
   showWordmark?: boolean
+  showTagline?: boolean
   className?: string
   markClassName?: string
   textClassName?: string
@@ -37,6 +38,7 @@ export function InfinityMark({
 export function Logo({
   size = 32,
   showWordmark = true,
+  showTagline = false,
   className,
   markClassName,
   textClassName,
@@ -55,12 +57,17 @@ export function Logo({
       {showWordmark && (
         <span
           className={cn(
-            'font-bold tracking-tight text-surface-900 dark:text-white',
+            'flex flex-col font-semibold tracking-tight text-text dark:text-white',
             textClassName,
           )}
           style={{ fontSize: `${numericSize * 0.6}px` }}
         >
-          Infinity Barbers
+          <span>INFINITY BARBERS</span>
+          {showTagline && (
+            <span className="text-[0.55em] font-normal tracking-normal text-text-muted">
+              Look Good. Feel Great.
+            </span>
+          )}
         </span>
       )}
     </div>

@@ -47,7 +47,7 @@ export default function App() {
             duration: 4000,
             style: {
               borderRadius: '8px',
-              fontFamily: 'Inter var, Inter, system-ui, sans-serif',
+              fontFamily: 'Poppins, system-ui, sans-serif',
             },
           }}
         />

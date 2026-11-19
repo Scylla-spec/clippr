@@ -9,8 +9,7 @@ export function Card({ className, children, ...props }: HTMLAttributes<HTMLDivEl
   return (
     <div
       className={cn(
-        'rounded-xl bg-white shadow-sm ring-1 ring-slate-200',
-        'dark:bg-surface-800 dark:ring-surface-700',
+        'rounded-ui-lg border border-border bg-surface shadow-ui-sm',
         className,
       )}
       {...props}
@@ -23,7 +22,7 @@ export function Card({ className, children, ...props }: HTMLAttributes<HTMLDivEl
 export function CardHeader({ className, children, ...props }: HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={cn('border-b border-slate-200 px-4 py-3 dark:border-surface-700', className)}
+      className={cn('border-b border-border px-6 py-4', className)}
       {...props}
     >
       {children}

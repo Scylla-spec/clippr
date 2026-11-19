@@ -21,7 +21,11 @@ import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { CreateBookingModal } from './CreateBookingModal'
 import { AddWalkInModal } from './AddWalkInModal'
 
-export function DayViewSchedule() {
+interface DayViewScheduleProps {
+  source?: 'appointment' | 'walk_in'
+}
+
+export function DayViewSchedule({ source }: DayViewScheduleProps) {
   const [selectedDate, setSelectedDate] = useState<string>(toHarareDateString())
   const [selectedBarberId, setSelectedBarberId] = useState<string>('')
 
@@ -34,6 +38,7 @@ export function DayViewSchedule() {
   const { data: bookings, isLoading, error, refetch } = useDayBookings(
     selectedDate,
     selectedBarberId || undefined,
+    source,
   )
 
   const createBooking = useCreateBooking()
@@ -66,31 +71,41 @@ export function DayViewSchedule() {
       {/* Action Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h2 className="text-lg font-bold text-surface-900 dark:text-white">Day Schedule</h2>
+          <h2 className="text-lg font-bold text-surface-900 dark:text-white">
+            {source === 'appointment' ? 'Appointments' : source === 'walk_in' ? 'Walk-ins' : 'Day Schedule'}
+          </h2>
           <p className="text-xs text-slate-500 dark:text-slate-400">
-            Appointments and walk-in queue timeline across barbers.
+            {source === 'appointment'
+              ? 'Scheduled appointments across all barbers.'
+              : source === 'walk_in'
+                ? 'Walk-in clients and their queue status across all barbers.'
+                : 'Appointments and walk-in queue timeline across barbers.'}
           </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => setIsWalkInModalOpen(true)}
-            className="text-xs font-semibold flex items-center gap-1.5"
-          >
-            <Footprints className="h-4 w-4" aria-hidden="true" />
-            <span>Add Walk-in</span>
-          </Button>
+          {source !== 'appointment' && (
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => setIsWalkInModalOpen(true)}
+              className="text-xs font-semibold flex items-center gap-1.5"
+            >
+              <Footprints className="h-4 w-4" aria-hidden="true" />
+              <span>Add Walk-in</span>
+            </Button>
+          )}
 
-          <Button
-            variant="primary"
-            size="sm"
-            onClick={() => setIsBookingModalOpen(true)}
-            className="text-xs font-semibold"
-          >
-            + New Appointment
-          </Button>
+          {source !== 'walk_in' && (
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => setIsBookingModalOpen(true)}
+              className="text-xs font-semibold"
+            >
+              + New Appointment
+            </Button>
+          )}
         </div>
       </div>
 
@@ -171,16 +186,26 @@ export function DayViewSchedule() {
             <EmptyState
               icon={<CalendarDays className="h-10 w-10 text-slate-400" aria-hidden="true" />}
               title="No bookings on this day"
-              description="No appointments or walk-in clients scheduled for the selected date."
+              description={
+                source === 'appointment'
+                  ? 'No appointments are scheduled for the selected date.'
+                  : source === 'walk_in'
+                    ? 'No walk-ins are scheduled for the selected date.'
+                    : 'No appointments or walk-in clients scheduled for the selected date.'
+              }
               action={
                 <div className="flex gap-2">
-                  <Button variant="secondary" size="sm" onClick={() => setIsWalkInModalOpen(true)} className="flex items-center gap-1.5">
-                    <Footprints className="h-4 w-4" aria-hidden="true" />
-                    <span>Add Walk-in</span>
-                  </Button>
-                  <Button variant="primary" size="sm" onClick={() => setIsBookingModalOpen(true)}>
-                    Book Appointment
-                  </Button>
+                  {source !== 'appointment' && (
+                    <Button variant="secondary" size="sm" onClick={() => setIsWalkInModalOpen(true)} className="flex items-center gap-1.5">
+                      <Footprints className="h-4 w-4" aria-hidden="true" />
+                      <span>Add Walk-in</span>
+                    </Button>
+                  )}
+                  {source !== 'walk_in' && (
+                    <Button variant="primary" size="sm" onClick={() => setIsBookingModalOpen(true)}>
+                      Book Appointment
+                    </Button>
+                  )}
                 </div>
               }
             />
@@ -327,7 +352,7 @@ export function DayViewSchedule() {
       )}
 
       {/* Appointment Creation Modal */}
-      <CreateBookingModal
+      {source !== 'walk_in' && <CreateBookingModal
         isOpen={isBookingModalOpen}
         onClose={() => setIsBookingModalOpen(false)}
         initialBarberId={selectedBarberId || undefined}
@@ -336,10 +361,10 @@ export function DayViewSchedule() {
           await createBooking.mutateAsync(data)
         }}
         isLoading={createBooking.isPending}
-      />
+      />}
 
       {/* Walk-in Modal */}
-      <AddWalkInModal
+      {source !== 'appointment' && <AddWalkInModal
         isOpen={isWalkInModalOpen}
         onClose={() => setIsWalkInModalOpen(false)}
         initialBarberId={selectedBarberId || undefined}
@@ -347,7 +372,7 @@ export function DayViewSchedule() {
           await createWalkIn.mutateAsync(data)
         }}
         isLoading={createWalkIn.isPending}
-      />
+      />}
 
       {/* Cancel Confirmation Dialog */}
       <ConfirmDialog

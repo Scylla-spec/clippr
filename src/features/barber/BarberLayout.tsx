@@ -3,6 +3,8 @@ import { useAuth } from '@/features/auth/useAuth'
 import { Button } from '@/components/ui/Button'
 import { Logo } from '@/components/brand/Logo'
 import { useState } from 'react'
+import { AppShell } from '@/components/layout/AppShell'
+import { BottomNav } from './BottomNav'
 
 export default function BarberLayout() {
   const { user, signOut } = useAuth()
@@ -16,43 +18,38 @@ export default function BarberLayout() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 dark:bg-surface-900 dark:text-slate-100 flex flex-col">
-      {/* Top Navbar */}
-      <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur dark:border-surface-700 dark:bg-surface-800/95">
-        <div className="mx-auto flex max-w-4xl items-center justify-between px-4 py-3 sm:px-6">
-          <div className="flex items-center gap-3">
-            <Link to="/barber/dashboard" className="flex items-center gap-2 group">
-              <Logo size={24} showWordmark={true} />
-              <span className="rounded bg-blue-500/10 px-2 py-0.5 text-xs font-semibold uppercase tracking-wider text-blue-600 dark:bg-blue-500/20 dark:text-blue-400">
+    <AppShell
+      mainClassName="mx-auto w-full max-w-4xl p-4 pb-24 sm:p-6 md:pb-6"
+      header={
+        <header className="sticky top-0 z-30 border-b border-white/10 bg-sidebar text-white">
+          <div className="mx-auto flex min-h-16 max-w-4xl items-center justify-between gap-3 px-4 py-2 sm:px-6">
+            <Link to="/barber/dashboard" aria-label="Infinity Barbers queue" className="flex items-center gap-3">
+              <Logo size={24} showWordmark textClassName="text-white" />
+              <span className="rounded-ui-sm bg-sidebar-hover px-2 py-1 text-xs font-semibold uppercase tracking-wider text-brand-300">
                 Barber
               </span>
             </Link>
-          </div>
 
-          <div className="flex items-center gap-3">
-            <div className="flex flex-col items-end text-right">
-              <span className="text-sm font-medium leading-none text-surface-900 dark:text-white">
+            <div className="flex items-center gap-3">
+              <span className="hidden text-sm font-medium text-white sm:inline">
                 {user?.profile?.full_name ?? 'Barber'}
               </span>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => void handleSignOut()}
+                isLoading={isSigningOut}
+                className="text-xs font-medium text-sidebar-text hover:text-white"
+              >
+                Sign out
+              </Button>
             </div>
-
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() => void handleSignOut()}
-              isLoading={isSigningOut}
-              className="text-xs font-medium"
-            >
-              Sign out
-            </Button>
           </div>
-        </div>
-      </header>
-
-      {/* Main Page Content */}
-      <main className="flex-1 mx-auto w-full max-w-4xl p-4 sm:p-6">
-        <Outlet />
-      </main>
-    </div>
+        </header>
+      }
+      bottomNavigation={<BottomNav />}
+    >
+      <Outlet />
+    </AppShell>
   )
 }

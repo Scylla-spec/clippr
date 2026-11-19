@@ -13,6 +13,7 @@ describe('AuthGuard', () => {
       isLoading: true,
       signIn: vi.fn(),
       signOut: vi.fn(),
+      refreshProfile: vi.fn(),
     })
 
     render(
@@ -39,6 +40,7 @@ describe('AuthGuard', () => {
       isLoading: false,
       signIn: vi.fn(),
       signOut: vi.fn(),
+      refreshProfile: vi.fn(),
     })
 
     render(
@@ -77,6 +79,7 @@ describe('AuthGuard', () => {
       isLoading: false,
       signIn: vi.fn(),
       signOut: vi.fn(),
+      refreshProfile: vi.fn(),
     })
 
     render(

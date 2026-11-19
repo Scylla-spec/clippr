@@ -8,7 +8,7 @@ An installable, production-ready Progressive Web App (PWA) designed for modern b
 
 - **Two Distinct Roles**:
   - **Admin / Receptionist**: Day schedule view across all barbers, create appointments, 1-click walk-in queue insertion, manage service catalog (duration, price), and provision/deactivate barber accounts.
-  - **Barber**: Dedicated chair view ("Now Serving", "Up Next", "Later Today", "Completed Today") with one-handed tap actions: *Start Service*, *Complete*, and *No-show*.
+  - **Barber**: Dedicated chair view ("Now Serving", "Up Next", "Later Today", "Completed Today") with one-handed tap actions: _Start Service_, _Complete_, and _No-show_.
 - **Unified Fair Queue**: Appointments and walk-ins share one queue per barber. Walk-ins are placed automatically into the next available slot.
 - **Database-Level Integrity**:
   - Overlap prevention using PostgreSQL exclusion constraints (`btree_gist` on `tstzrange`).
@@ -27,18 +27,18 @@ An installable, production-ready Progressive Web App (PWA) designed for modern b
 
 ## Tech Stack
 
-| Layer | Technology |
-|---|---|
-| **Frontend Framework** | React 18 + Vite (TypeScript strict mode) |
-| **Styling** | Tailwind CSS 3 (mobile-first, dark/light theme tokens) |
-| **Routing** | React Router v6 with lazy route code splitting |
-| **Server State & Cache** | TanStack Query v5 (`offlineFirst` read mode) |
-| **Form Handling** | React Hook Form + Zod schema validation |
-| **Backend / Database** | Supabase: PostgreSQL, Auth, Row Level Security, Realtime |
-| **Serverless Computing** | Supabase Edge Functions (Deno + Service Role Key security) |
-| **Service Worker & PWA** | `vite-plugin-pwa` + Workbox |
+| Layer                    | Technology                                                               |
+| ------------------------ | ------------------------------------------------------------------------ |
+| **Frontend Framework**   | React 18 + Vite (TypeScript strict mode)                                 |
+| **Styling**              | Tailwind CSS 3 (mobile-first, dark/light theme tokens)                   |
+| **Routing**              | React Router v6 with lazy route code splitting                           |
+| **Server State & Cache** | TanStack Query v5 (`offlineFirst` read mode)                             |
+| **Form Handling**        | React Hook Form + Zod schema validation                                  |
+| **Backend / Database**   | Supabase: PostgreSQL, Auth, Row Level Security, Realtime                 |
+| **Serverless Computing** | Supabase Edge Functions (Deno + Service Role Key security)               |
+| **Service Worker & PWA** | `vite-plugin-pwa` + Workbox                                              |
 | **Time & Date Handling** | `date-fns` + `date-fns-tz` (stored in UTC, displayed in `Africa/Harare`) |
-| **Testing** | Vitest + React Testing Library (automated unit & component tests) |
+| **Testing**              | Vitest + React Testing Library (automated unit & component tests)        |
 
 ---
 
@@ -97,11 +97,13 @@ infinity-barbers/
 ## Local Setup & Development
 
 ### 1. Prerequisites
+
 - **Node.js** 20+ and **pnpm** (or npm)
 - **Supabase CLI** (`npm install -g supabase`)
 - **Docker Desktop** (for running local Supabase)
 
 ### 2. Install dependencies
+
 ```bash
 git clone <repo-url>
 cd infinity-barbers
@@ -109,11 +111,15 @@ pnpm install
 ```
 
 ### 3. Configure environment variables
+
 Copy the example environment configuration:
+
 ```bash
 copy .env.example .env.local
 ```
+
 Fill in your local or hosted Supabase project credentials:
+
 ```env
 VITE_SUPABASE_URL=http://127.0.0.1:54321
 VITE_SUPABASE_ANON_KEY=your-anon-key-here
@@ -121,26 +127,32 @@ VITE_APP_URL=http://localhost:5173
 ```
 
 ### 4. Start local Supabase and apply migrations
+
 ```bash
 pnpm supabase start
 pnpm supabase db reset
 ```
+
 This runs all migrations in `supabase/migrations/` and seeds the database with:
+
 - **Shop Admin**: `admin@infinitybarbers.local` (Password: `password123`)
 - **Barber 1**: `tendai@infinitybarbers.local` (Password: `password123`)
 - **Barber 2**: `rudo@infinitybarbers.local` (Password: `password123`)
 - 4 default services and today's sample bookings.
 
 ### 5. Start the local Edge Function
+
 ```bash
 # Note: --no-verify-jwt is strictly for local testing. In production, JWT verification must always be ON.
 pnpm supabase functions serve create-barber --no-verify-jwt
 ```
 
 ### 6. Run the Vite development server
+
 ```bash
 pnpm dev
 ```
+
 Open **`http://localhost:5173`** in your browser.
 
 ---
@@ -148,6 +160,7 @@ Open **`http://localhost:5173`** in your browser.
 ## Testing & Verification
 
 ### Run Automated Test Suite
+
 ```bash
 # Run all unit and component tests
 pnpm test
@@ -163,11 +176,15 @@ pnpm lint
 ```
 
 ### Run Row Level Security (RLS) SQL Verification
+
 To verify that barbers cannot read other barbers' clients or bookings, open **Supabase Studio SQL Editor** (`http://localhost:54323`) and execute:
+
 ```sql
 -- Execute the contents of supabase/rls_tests.sql
 ```
+
 Verify that all 9 tests report **`PASS`**:
+
 - `TEST 1 — Barber reads own bookings: PASS`
 - `TEST 2 — Barber cannot read other barber bookings: PASS`
 - `TEST 3 — Admin reads all bookings: PASS`
@@ -194,9 +211,12 @@ where id = (
 );
 ```
 
+Use the email for the intended owner/admin account in the SQL query, and run it only in the Supabase project configured in the app's `VITE_SUPABASE_URL`. The signed-in account must have a matching row in `public.profiles` with `role = 'admin'` and `is_active = true`; after changing it, sign out and back in. Do not make a user an admin from the client app.
+
 Turn off public signups in Supabase Authentication settings before deploying.
 
 ### 1. Supabase Cloud Setup
+
 1. Create a project at [supabase.com](https://supabase.com).
 2. Link your local project:
    ```bash
@@ -211,9 +231,10 @@ Turn off public signups in Supabase Authentication settings before deploying.
    pnpm supabase functions deploy create-barber
    ```
    > **Security Requirement**: The `create-barber` Edge Function must be deployed with JWT verification **ON** (default in Supabase CLI; never pass `--no-verify-jwt` outside local development). Configure the `ALLOWED_ORIGINS` environment variable in your Supabase dashboard or secrets (`pnpm supabase secrets set ALLOWED_ORIGINS="https://your-domain.com"`) to enforce origin allowlisting.
-   *(The Edge Function automatically inherits `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` within the Supabase Cloud environment).*
+   > _(The Edge Function automatically inherits `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` within the Supabase Cloud environment)._
 
 ### 2. Frontend Deployment (Vercel)
+
 1. Import the repository into [Vercel](https://vercel.com).
 2. Configure Environment Variables in the project settings:
    - `VITE_SUPABASE_URL`: Your Supabase Project URL
@@ -222,6 +243,7 @@ Turn off public signups in Supabase Authentication settings before deploying.
    - `vercel.json` automatically configures SPA fallback routes and Content Security Policy headers.
 
 ### 3. Frontend Deployment (Netlify)
+
 1. Import the repository into [Netlify](https://netlify.com).
 2. Set Build Command: `pnpm build`
 3. Set Publish Directory: `dist`
@@ -259,6 +281,7 @@ Turn off public signups in Supabase Authentication settings before deploying.
 ## Known Phase 1 Limitations
 
 The following capabilities are deliberately excluded from Phase 1 (MVP) per project specifications:
+
 1. **Client Self-Booking Web Portal**: Clients cannot currently book themselves online; all bookings are entered by the receptionist/admin. (Scheduled for Phase 2).
 2. **Automated SMS & WhatsApp Reminders**: No automated notifications are sent upon appointment confirmation. (Scheduled for Phase 2 via Twilio/Africa's Talking integration).
 3. **Payments & Cash Register**: Payment records and POS terminal integrations are not included. (Scheduled for Phase 2).

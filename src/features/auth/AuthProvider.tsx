@@ -77,6 +77,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [clearAllCaches])
 
+  const refreshProfile = useCallback(async () => {
+    const userId = currentUserIdRef.current
+    if (!userId) return
+
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', userId)
+      .single()
+
+    if (error) throw error
+    setUser((current) => (current?.id === userId ? { ...current, profile: data } : current))
+  }, [])
+
   const signIn = useCallback(
     async ({ email, password }: SignInCredentials): Promise<{ error?: string }> => {
       try {
@@ -186,7 +200,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [clearAllCaches, handleUserIdChange])
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, signIn, signOut }}>
+    <AuthContext.Provider value={{ user, isLoading, signIn, signOut, refreshProfile }}>
       {children}
     </AuthContext.Provider>
   )

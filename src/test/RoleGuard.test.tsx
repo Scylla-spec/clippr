@@ -23,6 +23,7 @@ describe('RoleGuard', () => {
       isLoading: false,
       signIn: vi.fn(),
       signOut: vi.fn(),
+      refreshProfile: vi.fn(),
     })
 
     render(
@@ -61,6 +62,7 @@ describe('RoleGuard', () => {
       isLoading: false,
       signIn: vi.fn(),
       signOut: vi.fn(),
+      refreshProfile: vi.fn(),
     })
 
     render(

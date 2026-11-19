@@ -2,29 +2,135 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  color-scheme: light;
+  --brand-500: #FF8A00;
+  --brand-500-rgb: 255 138 0;
+  --brand-300: #FFBC68;
+  --brand-300-rgb: 255 188 104;
+  --brand-600: #E67A00;
+  --brand-600-rgb: 230 122 0;
+  --brand-text: #B45309;
+  --on-brand: #181818;
+  --sidebar: #1C1C1E;
+  --sidebar-hover: #2A2A2D;
+  --sidebar-text: #A1A1A6;
+  --sidebar-text-active: #181818;
+  --page: #F5F5FA;
+  --surface: #FFFFFF;
+  --surface-dark: #222222;
+  --text: #181818;
+  --text-muted: #6B6B73;
+  --border: #E6E6EE;
+  --surface-50: #F8F8FB;
+  --surface-100: #F1F1F6;
+  --surface-200: #E6E6EE;
+  --surface-300: #D1D1DA;
+  --surface-400: #A1A1A6;
+  --surface-500: #6B6B73;
+  --surface-600: #3B3B40;
+  --surface-700: #2A2A2D;
+  --surface-800: #222222;
+  --surface-900: #181818;
+  --surface-950: #111112;
+  --status-booked-bg: #DBEAFE;
+  --status-booked-text: #1E40AF;
+  --status-waiting-bg: #FEF3C7;
+  --status-waiting-text: #854D0E;
+  --status-in-service-bg: #DCFCE7;
+  --status-in-service-text: #166534;
+  --status-done-bg: #F3F4F6;
+  --status-done-text: #374151;
+  --status-no-show-bg: #FFEDD5;
+  --status-no-show-text: #9A3412;
+  --status-cancelled-bg: #FEE2E2;
+  --status-cancelled-text: #991B1B;
+  --status-neutral-bg: #F3F4F6;
+  --status-neutral-text: #374151;
+  --status-success-bg: #DCFCE7;
+  --status-success-text: #166534;
+  --status-warning-bg: #FEF3C7;
+  --status-warning-text: #854D0E;
+  --status-danger-bg: #FEE2E2;
+  --status-danger-text: #991B1B;
+}
+
+.dark {
+  color-scheme: dark;
+  --page: #181818;
+  --surface: #222222;
+  --surface-dark: #1C1C1E;
+  --text: #F5F5F5;
+  --text-muted: #B8B8BE;
+  --border: #3B3B40;
+  --surface-50: #111112;
+  --surface-100: #181818;
+  --surface-200: #222222;
+  --surface-300: #3B3B40;
+  --surface-400: #77777F;
+  --surface-500: #A1A1A6;
+  --surface-600: #B8B8BE;
+  --surface-700: #D1D1D6;
+  --surface-800: #222222;
+  --surface-900: #181818;
+  --surface-950: #111112;
+  --status-booked-bg: #1E3A5F;
+  --status-booked-text: #BFDBFE;
+  --status-waiting-bg: #4A3510;
+  --status-waiting-text: #FDE68A;
+  --status-in-service-bg: #153D26;
+  --status-in-service-text: #BBF7D0;
+  --status-done-bg: #333338;
+  --status-done-text: #E5E7EB;
+  --status-no-show-bg: #4A2815;
+  --status-no-show-text: #FED7AA;
+  --status-cancelled-bg: #4A1F24;
+  --status-cancelled-text: #FECACA;
+  --status-neutral-bg: #333338;
+  --status-neutral-text: #E5E7EB;
+  --status-success-bg: #153D26;
+  --status-success-text: #BBF7D0;
+  --status-warning-bg: #4A3510;
+  --status-warning-text: #FDE68A;
+  --status-danger-bg: #4A1F24;
+  --status-danger-text: #FECACA;
+}
+
 @layer base {
-  /* Smooth focus rings for keyboard navigation (WCAG 2.1 AA) */
-  :focus-visible {
-    @apply outline-none ring-2 ring-brand-500 ring-offset-2 ring-offset-white dark:ring-offset-surface-900;
+  html {
+    font-family: Poppins, system-ui, sans-serif;
   }
 
-  /* Consistent scrollbar (Chromium) */
+  body {
+    @apply bg-page text-text antialiased;
+  }
+
+  :focus-visible {
+    @apply outline-none ring-2 ring-brand-text ring-offset-2 ring-offset-surface;
+  }
+
   ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
   }
+
   ::-webkit-scrollbar-track {
     @apply bg-transparent;
   }
+
   ::-webkit-scrollbar-thumb {
-    @apply rounded-full bg-slate-300 dark:bg-surface-600;
+    @apply rounded-full bg-surface-300 dark:bg-surface-600;
   }
 
-  /* iOS input zoom prevention: font-size >= 16px on inputs */
   input,
   select,
   textarea {
     font-size: 16px;
+  }
+
+  time,
+  [data-numeric] {
+    font-variant-numeric: tabular-nums;
   }
 
   @media (min-width: 640px) {
@@ -37,7 +143,6 @@
 }
 
 @layer components {
-  /* Reusable minimum touch target */
   .touch-target {
     @apply min-h-touch min-w-touch;
   }
