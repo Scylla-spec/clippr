@@ -120,10 +120,10 @@ export default {
         xs: '375px',
       },
       minHeight: {
-        touch: '44px',
+        touch: '48px',
       },
       minWidth: {
-        touch: '44px',
+        touch: '48px',
       },
     },
   },

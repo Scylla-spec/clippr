@@ -4,6 +4,7 @@ import { useAuth } from '@/features/auth/useAuth'
 import { useBarberQueue } from './useBarberQueue'
 import type { TodayQueueRow } from '@/lib/database.types'
 import { formatDateInHarare } from '@/lib/dates'
+import { getHarareGreeting } from '@/lib/dates'
 import { NowServingCard } from './NowServingCard'
 import { UpNextCard } from './UpNextCard'
 import { UpcomingQueueList } from './UpcomingQueueList'
@@ -29,6 +30,9 @@ export default function BarberDashboardPage() {
   const [noShowTarget, setNoShowTarget] = useState<TodayQueueRow | null>(null)
 
   const todayDisplay = formatDateInHarare(new Date().toISOString())
+  const barberName = user?.profile?.full_name?.trim().split(/\s+/)[0] || 'Barber'
+  const queueCount = (queue?.upNext ? 1 : 0) + (queue?.remaining.length ?? 0)
+  const isOnShift = user?.profile?.is_active ?? true
 
   const handleStartService = async (booking: TodayQueueRow) => {
     await updateStatus({
@@ -64,9 +68,34 @@ export default function BarberDashboardPage() {
     (queue?.completed.length ?? 0) > 0
 
   return (
-    <div className="space-y-6 max-w-2xl mx-auto pb-12">
-      {/* Top Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:between gap-3">
+    <div className="mx-auto max-w-2xl space-y-4 pb-12 sm:space-y-6">
+      <section
+        aria-label="Welcome"
+        className="relative overflow-hidden rounded-ui-xl bg-[radial-gradient(120%_140%_at_100%_0%,rgba(255,138,0,0.55),transparent_55%),linear-gradient(160deg,#2a2a2d,#161618)] px-5 py-5 text-white shadow-ui-sm sm:p-6 lg:hidden"
+      >
+        <p className="text-xs font-medium uppercase tracking-[0.16em] text-brand-300">
+          Infinity Barbers
+        </p>
+        <h1 className="mt-1 text-[24px] font-bold leading-tight tracking-tight">
+          {getHarareGreeting()},<br />
+          {barberName}
+        </h1>
+        <p className="mt-1 text-sm text-white/75">{todayDisplay}</p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          <span className="inline-flex min-h-8 items-center gap-2 rounded-full bg-white/10 px-3 text-xs font-medium">
+            <span
+              className={`h-2 w-2 rounded-full ${isOnShift ? 'bg-emerald-400' : 'bg-slate-400'}`}
+              aria-hidden="true"
+            />
+            {isOnShift ? 'On shift' : 'Off shift'}
+          </span>
+          <span className="inline-flex min-h-8 items-center rounded-full bg-white/10 px-3 text-xs font-medium">
+            {queueCount} {queueCount === 1 ? 'client' : 'clients'} waiting
+          </span>
+        </div>
+      </section>
+
+      <div className="hidden flex-col gap-3 sm:flex-row sm:items-center sm:justify-between lg:flex">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-surface-900 dark:text-white sm:text-3xl">
             My Chair

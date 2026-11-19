@@ -45,4 +45,17 @@ describe('AdminSidebar', () => {
 
     expect(onSignOut).toHaveBeenCalledOnce()
   })
+
+  it('keeps navigation labels and the full brand visible in the tablet drawer', () => {
+    render(
+      <MemoryRouter initialEntries={['/admin/dashboard']}>
+        <AdminSidebar presentation="drawer" onSignOut={vi.fn()} isSigningOut={false} />
+      </MemoryRouter>,
+    )
+
+    expect(screen.getByText('INFINITY BARBERS')).toBeVisible()
+    expect(screen.getByText('Look Good. Feel Great.')).toBeVisible()
+    expect(screen.getByRole('link', { name: 'Dashboard' })).toBeVisible()
+    expect(screen.getByRole('link', { name: 'Appointments' })).toBeVisible()
+  })
 })

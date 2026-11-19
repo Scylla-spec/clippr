@@ -19,7 +19,7 @@ export function AppShell({
   mainClassName,
 }: AppShellProps) {
   return (
-    <div className="flex min-h-screen bg-page text-text">
+    <div className="flex min-h-dvh overflow-x-clip bg-page text-text">
       <a
         href="#main-content"
         className="sr-only z-80 rounded-ui-md bg-surface px-4 py-2 text-text shadow-ui-md focus:not-sr-only focus:fixed focus:left-4 focus:top-4"
@@ -27,13 +27,13 @@ export function AppShell({
         Skip to content
       </a>
       {sidebar}
-      <div className={cn('flex min-h-screen min-w-0 flex-1 flex-col', hasSidebar && 'md:pl-20 lg:pl-64')}>
+      <div className={cn('flex min-h-dvh min-w-0 flex-1 flex-col', hasSidebar && 'lg:pl-64')}>
         {header}
         <main
           id="main-content"
           className={cn(
             'mx-auto w-full max-w-screen-2xl flex-1 p-4 sm:p-6 lg:p-8',
-            bottomNavigation && 'pb-24 md:pb-6',
+            bottomNavigation && 'pb-[calc(56px+env(safe-area-inset-bottom)+1.5rem)] lg:pb-6',
             mainClassName,
           )}
         >

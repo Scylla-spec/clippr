@@ -35,6 +35,20 @@ export function formatDateInHarare(utcIso: string): string {
 }
 
 /**
+ * Formats the current date for the compact mobile app bar (e.g. "Thu 19 Nov").
+ */
+export function formatShortDateInHarare(date: Date = new Date()): string {
+  return format(toHarareTime(date), 'EEE d MMM')
+}
+
+export function getHarareGreeting(date: Date = new Date()): string {
+  const hour = toHarareTime(date).getHours()
+  if (hour < 12) return 'Good morning'
+  if (hour < 17) return 'Good afternoon'
+  return 'Good evening'
+}
+
+/**
  * Formats a UTC ISO timestamp into YYYY-MM-DD in Africa/Harare.
  */
 export function toHarareDateString(date: Date = new Date()): string {

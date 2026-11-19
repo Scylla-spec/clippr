@@ -1,13 +1,30 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { CreateBookingModal } from '@/features/bookings/CreateBookingModal'
 import * as servicesHook from '@/features/services/useServices'
 import * as barbersHook from '@/features/barbers/useBarbers'
 import type { Service, Profile } from '@/lib/database.types'
+import { toHarareDateString } from '@/lib/dates'
 
 vi.mock('@/features/services/useServices')
 vi.mock('@/features/barbers/useBarbers')
+vi.mock('@/features/bookings/useBookings', () => ({
+  useDayBookings: () => ({ data: [] }),
+}))
+
+const { maybeSingle } = vi.hoisted(() => ({
+  maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }),
+}))
+vi.mock('@/lib/supabase', () => ({
+  supabase: {
+    from: () => ({
+      select: () => ({
+        eq: () => ({ maybeSingle }),
+      }),
+    }),
+  },
+}))
 
 const mockServices: Service[] = [
   {
@@ -54,17 +71,17 @@ describe('CreateBookingModal', () => {
     render(<CreateBookingModal isOpen={true} onClose={vi.fn()} onSubmit={vi.fn()} />)
 
     expect(screen.getByRole('dialog')).toBeInTheDocument()
-    expect(screen.getByLabelText(/Client Name/i)).toBeInTheDocument()
-    expect(screen.getByLabelText(/Phone Number/i)).toBeInTheDocument()
-    expect(screen.getByLabelText(/^Barber/i)).toBeInTheDocument()
-    expect(screen.getByLabelText(/^Service/i)).toBeInTheDocument()
+    expect(screen.getByLabelText(/Phone number/i)).toHaveAttribute('type', 'tel')
+    expect(screen.getByLabelText(/Client name/i)).toBeInTheDocument()
+    expect(screen.getByRole('group', { name: 'Service' })).toBeInTheDocument()
+    expect(screen.getByRole('group', { name: 'Barber' })).toBeInTheDocument()
   })
 
   it('validates required fields before submitting', async () => {
     const handleSubmit = vi.fn()
     render(<CreateBookingModal isOpen={true} onClose={vi.fn()} onSubmit={handleSubmit} />)
 
-    const submitBtn = screen.getByRole('button', { name: /Book Appointment/i })
+    const submitBtn = screen.getByRole('button', { name: /Save appointment/i })
     await userEvent.click(submitBtn)
 
     expect(handleSubmit).not.toHaveBeenCalled()
@@ -80,31 +97,29 @@ describe('CreateBookingModal', () => {
         isOpen={true}
         onClose={handleClose}
         onSubmit={handleSubmit}
-        initialDate="2026-11-15"
+        initialDate={toHarareDateString()}
       />,
     )
 
-    await userEvent.type(screen.getByLabelText(/Client Name/i), 'Farai Mutasa')
-    await userEvent.type(screen.getByLabelText(/Phone Number/i), '0771234567')
+    await userEvent.type(screen.getByLabelText(/Client name/i), 'Farai Mutasa')
+    await userEvent.type(screen.getByLabelText(/Phone number/i), '0771234567')
 
-    await userEvent.selectOptions(
-      screen.getByLabelText(/^Barber/i),
-      '00000000-0000-0000-0000-000000000002',
-    )
-    await userEvent.selectOptions(
-      screen.getByLabelText(/^Service/i),
-      '10000000-0000-0000-0000-000000000001',
-    )
+    await userEvent.click(screen.getByRole('button', { name: /Haircut.*30 min/i }))
+    await userEvent.click(screen.getByRole('button', { name: /Tendai Moyo/i }))
 
-    const submitBtn = screen.getByRole('button', { name: /Book Appointment/i })
-    await userEvent.click(submitBtn)
+    const timeChoices = await within(
+      screen.getByRole('group', { name: /Free times with Tendai Moyo/ }),
+    ).findAllByRole('button', { name: /\d{1,2}:\d{2} [AP]M/ })
+    await userEvent.click(timeChoices[0])
+    await userEvent.click(screen.getByRole('button', { name: /Save appointment/i }))
 
     expect(handleSubmit).toHaveBeenCalledWith(
       expect.objectContaining({
         clientName: 'Farai Mutasa',
-        clientPhone: '+263771234567', // Normalized to E.164!
+        clientPhone: '+263771234567',
         barberId: '00000000-0000-0000-0000-000000000002',
         serviceId: '10000000-0000-0000-0000-000000000001',
+        bookingDate: toHarareDateString(),
       }),
     )
   })

@@ -44,6 +44,11 @@ const AdminSettingsPage = lazy(() =>
     default: module.AccountSettingsPage,
   })),
 )
+const AdminMorePage = lazy(() =>
+  import('@/features/admin/AdminMobileNavigation').then((module) => ({
+    default: module.AdminMorePage,
+  })),
+)
 const BarberLayout = lazy(() => import('@/features/barber/BarberLayout'))
 const BarberDashboardPage = lazy(() => import('@/features/barber/BarberDashboardPage'))
 const BarberHistoryPage = lazy(() =>
@@ -155,6 +160,14 @@ export const router = createBrowserRouter([
         element: (
           <Lazy>
             <AdminSettingsPage />
+          </Lazy>
+        ),
+      },
+      {
+        path: 'more',
+        element: (
+          <Lazy>
+            <AdminMorePage />
           </Lazy>
         ),
       },

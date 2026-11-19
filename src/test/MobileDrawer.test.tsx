@@ -54,4 +54,15 @@ describe('MobileDrawer', () => {
 
     expect(lastItem).toHaveFocus()
   })
+
+  it('closes when the drawer is swiped to the left', () => {
+    render(<DrawerHarness />)
+    fireEvent.click(screen.getByRole('button', { name: 'Open drawer' }))
+
+    const drawer = screen.getByRole('dialog', { name: 'Test navigation' })
+    fireEvent.touchStart(drawer, { changedTouches: [{ clientX: 240 }] })
+    fireEvent.touchEnd(drawer, { changedTouches: [{ clientX: 120 }] })
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+  })
 })

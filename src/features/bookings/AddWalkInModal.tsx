@@ -1,12 +1,16 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Footprints } from 'lucide-react'
+import { Footprints, X } from 'lucide-react'
+import toast from 'react-hot-toast'
 import { walkInSchema, type WalkInFormData } from './booking.schema'
 import { useServices } from '@/features/services/useServices'
 import { useBarbers } from '@/features/barbers/useBarbers'
-import { Input } from '@/components/ui/Input'
-import { Button } from '@/components/ui/Button'
+import { useDayBookings } from './useBookings'
+import { getNextAvailableSlot } from './queue'
+import { toHarareDateString, formatTimeInHarare } from '@/lib/dates'
+import { normalizePhone, isValidPhone } from '@/lib/phone'
+import { supabase } from '@/lib/supabase'
 
 interface AddWalkInModalProps {
   isOpen: boolean
@@ -23,15 +27,16 @@ export function AddWalkInModal({
   initialBarberId,
   isLoading = false,
 }: AddWalkInModalProps) {
+  const [submissionError, setSubmissionError] = useState('')
   const { data: services } = useServices(false)
   const { data: barbers } = useBarbers()
-  const activeBarbers = barbers?.filter((b) => b.is_active) ?? []
-
+  const activeBarbers = barbers?.filter((barber) => barber.is_active) ?? []
   const {
     register,
     handleSubmit,
     reset,
     setValue,
+    watch,
     formState: { errors },
   } = useForm<WalkInFormData>({
     resolver: zodResolver(walkInSchema),
@@ -42,117 +47,226 @@ export function AddWalkInModal({
       serviceId: '',
     },
   })
+  const phoneField = register('clientPhone')
+  const selectedBarberId = watch('barberId')
+  const selectedServiceId = watch('serviceId')
+  const selectedService = services?.find((service) => service.id === selectedServiceId)
+  const today = toHarareDateString()
+  const { data: dayBookings = [] } = useDayBookings(today)
 
   useEffect(() => {
-    if (isOpen && initialBarberId) {
-      setValue('barberId', initialBarberId)
-    }
-  }, [isOpen, initialBarberId, setValue])
+    if (isOpen && initialBarberId) setValue('barberId', initialBarberId)
+    if (!isOpen) reset()
+  }, [isOpen, initialBarberId, reset, setValue])
 
   if (!isOpen) return null
 
+  const getNextFreeTime = (barberId: string) => {
+    if (!selectedService) return 'Choose a service'
+    const activeBookings = dayBookings
+      .filter(
+        (booking) =>
+          booking.barber_id === barberId &&
+          booking.status !== 'cancelled' &&
+          booking.status !== 'no_show',
+      )
+      .map((booking) => ({ start_time: booking.start_time, end_time: booking.end_time }))
+    const now = new Date()
+    const candidate = getNextAvailableSlot(activeBookings, selectedService.duration_min, now)
+    return formatTimeInHarare(candidate.toISOString())
+  }
+
   const handleClose = () => {
     reset()
+    setSubmissionError('')
     onClose()
+  }
+
+  const lookupClientByPhone = async () => {
+    const rawPhone = watch('clientPhone').trim()
+    if (!rawPhone) return
+    const normalizedPhone = normalizePhone(rawPhone)
+    if (!isValidPhone(normalizedPhone)) return
+
+    try {
+      const { data, error } = await supabase
+        .from('clients')
+        .select('full_name')
+        .eq('phone', normalizedPhone)
+        .maybeSingle()
+      if (error) throw error
+      if (data && !watch('clientName')) {
+        setValue('clientName', data.full_name, { shouldValidate: true })
+      }
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Could not look up this client')
+    }
   }
 
   return (
     <div
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="walk-in-title"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+      className="fixed inset-0 z-70 flex items-end bg-black/50"
+      onClick={(event) => {
+        if (event.target === event.currentTarget && !isLoading) handleClose()
+      }}
     >
-      <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl dark:bg-surface-800">
-        <div className="flex items-center gap-2">
-          <Footprints className="h-5 w-5 text-brand-600 dark:text-brand-400" aria-hidden="true" />
-          <h2 id="walk-in-title" className="text-lg font-bold text-surface-900 dark:text-white">
-            Quick Add Walk-in
-          </h2>
+      <section
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="walk-in-title"
+        className="flex max-h-[100dvh] w-full flex-col rounded-t-ui-xl bg-surface shadow-ui-lg motion-safe:animate-[sheet-up_180ms_ease-out]"
+      >
+        <div className="shrink-0 px-4 pt-3">
+          <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-border" aria-hidden="true" />
+          <header className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <Footprints className="h-5 w-5 text-brand-text" aria-hidden="true" />
+              <div>
+                <h2 id="walk-in-title" className="text-xl font-semibold">
+                  Add walk-in
+                </h2>
+                <p className="text-sm text-text-muted">Add a client to today’s live queue.</p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={handleClose}
+              disabled={isLoading}
+              aria-label="Close walk-in form"
+              className="inline-flex h-12 w-12 items-center justify-center rounded-full text-text-muted hover:bg-page"
+            >
+              <X className="h-5 w-5" aria-hidden="true" />
+            </button>
+          </header>
         </div>
-        <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-          Walk-ins enter the unified queue immediately at the earliest free slot for the selected barber.
-        </p>
-
         <form
           noValidate
           onSubmit={handleSubmit(async (data) => {
-            await onSubmit(data)
-            handleClose()
+            setSubmissionError('')
+            try {
+              await onSubmit(data)
+              handleClose()
+            } catch (error) {
+              setSubmissionError(
+                error instanceof Error ? error.message : 'Could not add this walk-in',
+              )
+            }
           })}
-          className="mt-5 space-y-4"
+          className="min-h-0 flex-1 overflow-y-auto"
         >
-          <Input
-            label="Client Name"
-            placeholder="e.g. Blessing Dube"
-            error={errors.clientName?.message}
-            required
-            {...register('clientName')}
-          />
+          <div className="space-y-4 px-4 py-4">
+            {submissionError ? (
+              <p
+                role="alert"
+                className="rounded-ui-md bg-status-danger-bg p-3 text-sm text-status-danger-text"
+              >
+                {submissionError}
+              </p>
+            ) : null}
+            <div>
+              <label htmlFor="walkin-client-phone" className="mb-1 block text-sm font-medium">
+                Phone number
+              </label>
+              <input
+                id="walkin-client-phone"
+                type="tel"
+                inputMode="tel"
+                autoComplete="tel"
+                placeholder="0771234567 or +263…"
+                aria-invalid={Boolean(errors.clientPhone)}
+                className="min-h-12 w-full rounded-ui-md border border-border bg-surface px-3 text-base"
+                {...phoneField}
+                onBlur={(event) => {
+                  void phoneField.onBlur(event)
+                  void lookupClientByPhone()
+                }}
+              />
+              {errors.clientPhone ? (
+                <p className="mt-1 text-sm text-status-danger-text">{errors.clientPhone.message}</p>
+              ) : null}
+            </div>
+            <div>
+              <label htmlFor="walkin-client-name" className="mb-1 block text-sm font-medium">
+                Client name
+              </label>
+              <input
+                id="walkin-client-name"
+                autoComplete="name"
+                placeholder="Client name"
+                aria-invalid={Boolean(errors.clientName)}
+                className="min-h-12 w-full rounded-ui-md border border-border bg-surface px-3 text-base"
+                {...register('clientName')}
+              />
+              {errors.clientName ? (
+                <p className="mt-1 text-sm text-status-danger-text">{errors.clientName.message}</p>
+              ) : null}
+            </div>
 
-          <Input
-            label="Phone Number"
-            placeholder="0771234567 or +263..."
-            hint="Normalized to Zimbabwe +263"
-            error={errors.clientPhone?.message}
-            required
-            {...register('clientPhone')}
-          />
+            <fieldset>
+              <legend className="mb-2 text-sm font-medium">Service</legend>
+              <div className="grid grid-cols-2 gap-2">
+                {(services ?? []).map((service) => (
+                  <button
+                    key={service.id}
+                    type="button"
+                    aria-pressed={selectedServiceId === service.id}
+                    onClick={() => setValue('serviceId', service.id, { shouldValidate: true })}
+                    className={`min-h-16 rounded-ui-md border p-3 text-left ${
+                      selectedServiceId === service.id
+                        ? 'border-brand-500 bg-brand-100 text-brand-text'
+                        : 'border-border bg-surface'
+                    }`}
+                  >
+                    <span className="block truncate text-sm font-semibold">{service.name}</span>
+                    <span className="mt-1 block text-xs text-text-muted">
+                      {service.duration_min} min · ${Number(service.price).toFixed(2)}
+                    </span>
+                  </button>
+                ))}
+              </div>
+              {errors.serviceId ? (
+                <p className="mt-1 text-sm text-status-danger-text">{errors.serviceId.message}</p>
+              ) : null}
+            </fieldset>
 
-          <div className="flex flex-col gap-1">
-            <label htmlFor="walkin-barber-select" className="text-sm font-medium text-slate-700 dark:text-slate-300">
-              Barber <span className="text-red-500">*</span>
-            </label>
-            <select
-              id="walkin-barber-select"
-              aria-invalid={errors.barberId ? 'true' : undefined}
-              className="block w-full rounded-lg border border-slate-300 px-3 py-2.5 text-base shadow-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500 dark:border-surface-600 dark:bg-surface-800 dark:text-white"
-              {...register('barberId')}
-            >
-              <option value="">Select a barber...</option>
-              {activeBarbers.map((b) => (
-                <option key={b.id} value={b.id}>
-                  {b.full_name}
-                </option>
-              ))}
-            </select>
-            {errors.barberId && (
-              <p className="text-xs font-medium text-red-600 dark:text-red-400">{errors.barberId.message}</p>
-            )}
+            <fieldset>
+              <legend className="mb-2 text-sm font-medium">Barber and next free time</legend>
+              <div className="space-y-2">
+                {activeBarbers.map((barber) => (
+                  <button
+                    key={barber.id}
+                    type="button"
+                    aria-pressed={selectedBarberId === barber.id}
+                    onClick={() => setValue('barberId', barber.id, { shouldValidate: true })}
+                    className={`flex min-h-14 w-full items-center justify-between gap-3 rounded-ui-md border px-3 text-left ${
+                      selectedBarberId === barber.id
+                        ? 'border-brand-500 bg-brand-100 text-brand-text'
+                        : 'border-border bg-surface'
+                    }`}
+                  >
+                    <span className="truncate text-sm font-semibold">{barber.full_name}</span>
+                    <span className="shrink-0 text-xs tabular-nums text-text-muted">
+                      Next free {getNextFreeTime(barber.id)}
+                    </span>
+                  </button>
+                ))}
+              </div>
+              {errors.barberId ? (
+                <p className="mt-1 text-sm text-status-danger-text">{errors.barberId.message}</p>
+              ) : null}
+            </fieldset>
           </div>
-
-          <div className="flex flex-col gap-1">
-            <label htmlFor="walkin-service-select" className="text-sm font-medium text-slate-700 dark:text-slate-300">
-              Service <span className="text-red-500">*</span>
-            </label>
-            <select
-              id="walkin-service-select"
-              aria-invalid={errors.serviceId ? 'true' : undefined}
-              className="block w-full rounded-lg border border-slate-300 px-3 py-2.5 text-base shadow-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500 dark:border-surface-600 dark:bg-surface-800 dark:text-white"
-              {...register('serviceId')}
+          <div className="sticky bottom-0 border-t border-border bg-surface px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3">
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="min-h-14 w-full rounded-ui-md bg-brand-500 px-4 text-base font-semibold text-on-brand disabled:opacity-60"
             >
-              <option value="">Select a service...</option>
-              {services?.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.name} ({s.duration_min} min — ${Number(s.price).toFixed(2)})
-                </option>
-              ))}
-            </select>
-            {errors.serviceId && (
-              <p className="text-xs font-medium text-red-600 dark:text-red-400">{errors.serviceId.message}</p>
-            )}
-          </div>
-
-          <div className="mt-6 flex justify-end gap-3 pt-2">
-            <Button type="button" variant="secondary" onClick={handleClose} disabled={isLoading}>
-              Cancel
-            </Button>
-            <Button type="submit" variant="primary" isLoading={isLoading}>
-              Insert Into Queue
-            </Button>
+              {isLoading ? 'Saving…' : 'Add to queue'}
+            </button>
           </div>
         </form>
-      </div>
+      </section>
     </div>
   )
 }

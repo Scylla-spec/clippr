@@ -9,7 +9,7 @@ import { loginSchema, type LoginFormData } from './auth.schema'
 import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
 import { Card, CardBody } from '@/components/ui/Card'
-import { Logo } from '@/components/brand/Logo'
+import { AnimatedInfinity } from '@/components/brand/AnimatedInfinity'
 
 export default function LoginPage() {
   const { signIn, user, isLoading: isAuthLoading } = useAuth()
@@ -56,37 +56,40 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-slate-50 px-4 py-8 dark:bg-surface-900">
-      <div className="w-full max-w-xs space-y-6">
-        <div className="text-center">
-          <div className="flex justify-center mb-3">
-            <Logo size={48} showWordmark={false} />
+    <main className="login-shell flex min-h-screen items-center justify-center px-4 py-8">
+      <div className="login-shell__glow login-shell__glow--a" aria-hidden="true" />
+      <div className="login-shell__glow login-shell__glow--b" aria-hidden="true" />
+      <div className="login-shell__grain" aria-hidden="true" />
+      <div className="login-shell__main w-full max-w-xs space-y-6">
+        <div className="login-shell__brand text-center">
+          <div className="login-shell__mark mb-3 flex justify-center">
+            <AnimatedInfinity size={72} />
           </div>
-          <h1 className="text-2xl font-bold tracking-tight text-surface-900 dark:text-white sm:text-3xl">
+          <h1 className="login-shell__name text-2xl font-bold tracking-tight sm:text-3xl">
             Infinity Barbers
           </h1>
-          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+          <p className="login-shell__tagline mt-1 text-sm">
             Barbershop booking &amp; queue management
           </p>
         </div>
 
-        <Card className="shadow-lg border-0 ring-1 ring-slate-200 dark:ring-surface-700">
+        <Card className="login-card border-0">
           <CardBody className="p-6 sm:p-8">
-            <h2 className="mb-6 text-lg font-semibold text-surface-900 dark:text-white">
+            <h2 className="login-card__title mb-6 text-lg font-semibold">
               Sign in to your account
             </h2>
 
             {formError && (
               <div
                 role="alert"
-                className="mb-6 flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 p-3.5 text-sm text-red-800 dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-300"
+                className="login-error mb-6 flex items-start gap-3 rounded-lg p-3.5 text-sm"
               >
-                <TriangleAlert className="h-5 w-5 shrink-0 text-red-500 dark:text-red-400" aria-hidden="true" />
+                <TriangleAlert className="h-5 w-5 shrink-0" aria-hidden="true" />
                 <p className="flex-1 font-medium">{formError}</p>
               </div>
             )}
 
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
+            <form onSubmit={handleSubmit(onSubmit)} className="login-form space-y-4" noValidate>
               <Input
                 label="Email address"
                 type="email"
@@ -94,6 +97,7 @@ export default function LoginPage() {
                 placeholder="you@example.com"
                 error={errors.email?.message}
                 required
+                className="login-input"
                 {...register('email')}
               />
 
@@ -104,6 +108,7 @@ export default function LoginPage() {
                 placeholder="••••••••"
                 error={errors.password?.message}
                 required
+                className="login-input"
                 {...register('password')}
               />
 
@@ -111,7 +116,7 @@ export default function LoginPage() {
                 type="submit"
                 variant="primary"
                 size="lg"
-                className="w-full mt-2 font-semibold shadow-sm"
+                className="login-btn mt-2 w-full font-semibold shadow-sm"
                 isLoading={isSubmitting}
               >
                 Sign in
