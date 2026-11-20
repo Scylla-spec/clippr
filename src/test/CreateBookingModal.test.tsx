@@ -40,7 +40,7 @@ const mockServices: Service[] = [
 const mockBarbers: Profile[] = [
   {
     id: '00000000-0000-0000-0000-000000000002',
-    full_name: 'Tendai Moyo',
+    full_name: 'Alex Smith',
     role: 'barber',
     is_active: true,
     created_at: new Date().toISOString(),
@@ -105,10 +105,10 @@ describe('CreateBookingModal', () => {
     await userEvent.type(screen.getByLabelText(/Phone number/i), '0771234567')
 
     await userEvent.click(screen.getByRole('button', { name: /Haircut.*30 min/i }))
-    await userEvent.click(screen.getByRole('button', { name: /Tendai Moyo/i }))
+    await userEvent.click(screen.getByRole('button', { name: /Alex Smith/i }))
 
     const timeChoices = await within(
-      screen.getByRole('group', { name: /Free times with Tendai Moyo/ }),
+      screen.getByRole('group', { name: /Free times with Alex Smith/ }),
     ).findAllByRole('button', { name: /\d{1,2}:\d{2} [AP]M/ })
     await userEvent.click(timeChoices[0])
     await userEvent.click(screen.getByRole('button', { name: /Save appointment/i }))

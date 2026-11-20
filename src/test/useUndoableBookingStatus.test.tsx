@@ -22,7 +22,7 @@ const booking: BookingWithDetails = {
   updated_at: '2026-11-19T07:00:00.000Z',
   client: { id: 'client-1', full_name: 'Blessing Dube', phone: '+263772000001' },
   service: { id: 'service-1', name: 'Haircut', duration_min: 30, price: 5 },
-  barber: { id: 'barber-1', full_name: 'Tendai Moyo' },
+  barber: { id: 'barber-1', full_name: 'Alex Smith' },
 }
 
 describe('useUndoableBookingStatus', () => {

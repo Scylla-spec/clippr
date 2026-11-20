@@ -21,7 +21,7 @@ const mockBooking: TodayQueueRow = {
   service_name: 'Hot Towel Shave',
   duration_min: 20,
   price: 3.0,
-  barber_name: 'Tendai Moyo',
+  barber_name: 'Alex Smith',
   queue_bucket: 0,
   in_service_first: 0,
 }

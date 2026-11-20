@@ -14,7 +14,7 @@ describe('RoleGuard', () => {
         email: 'barber@infinitybarbers.local',
         profile: {
           id: 'user-1',
-          full_name: 'Barber Tendai',
+          full_name: 'Barber Alex',
           role: 'barber',
           is_active: true,
           created_at: new Date().toISOString(),

@@ -27,7 +27,7 @@ const mockQueue: QueueView = {
     service_name: 'Hot Towel Shave',
     duration_min: 20,
     price: 3.0,
-    barber_name: 'Tendai Moyo',
+    barber_name: 'Alex Smith',
     queue_bucket: 0,
     in_service_first: 0,
   },
@@ -48,7 +48,7 @@ const mockQueue: QueueView = {
     service_name: 'Haircut',
     duration_min: 30,
     price: 5.0,
-    barber_name: 'Tendai Moyo',
+    barber_name: 'Alex Smith',
     queue_bucket: 0,
     in_service_first: 1,
   },
@@ -63,10 +63,10 @@ describe('BarberDashboardPage', () => {
     vi.spyOn(authHook, 'useAuth').mockReturnValue({
       user: {
         id: 'barber-1',
-        email: 'tendai@infinitybarbers.local',
+        email: 'alex@infinitybarbers.local',
         profile: {
           id: 'barber-1',
-          full_name: 'Tendai Moyo',
+          full_name: 'Alex Smith',
           role: 'barber',
           is_active: true,
           created_at: new Date().toISOString(),
@@ -94,7 +94,7 @@ describe('BarberDashboardPage', () => {
     render(<BarberDashboardPage />)
 
     expect(screen.getByRole('heading', { level: 1, name: /My Chair/i })).toBeInTheDocument()
-    expect(screen.getByText(/Tendai Moyo/i)).toBeInTheDocument()
+    expect(screen.getByText(/Alex Smith/i)).toBeInTheDocument()
     expect(screen.getByText(/Live sync/i)).toBeInTheDocument()
   })
 

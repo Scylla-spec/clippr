@@ -9,7 +9,7 @@ vi.mock('@/features/auth/useAuth', () => ({
     user: {
       id: 'barber-1',
       email: 'barber@example.com',
-      profile: { full_name: 'Tendai Moyo' },
+      profile: { full_name: 'Alex Smith' },
     },
     refreshProfile: vi.fn(),
     signOut,

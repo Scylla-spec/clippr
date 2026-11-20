@@ -21,7 +21,7 @@ const mockBooking: TodayQueueRow = {
   service_name: 'Haircut',
   duration_min: 30,
   price: 5.0,
-  barber_name: 'Tendai Moyo',
+  barber_name: 'Alex Smith',
   queue_bucket: 0,
   in_service_first: 1,
 }

@@ -135,10 +135,8 @@ pnpm supabase db reset
 
 This runs all migrations in `supabase/migrations/` and seeds the database with:
 
-- **Shop Admin**: `admin@infinitybarbers.local` (Password: `password123`)
-- **Barber 1**: `tendai@infinitybarbers.local` (Password: `password123`)
-- **Barber 2**: `rudo@infinitybarbers.local` (Password: `password123`)
-- 4 default services and today's sample bookings.
+- **Shop Admin**: `admin@infinitybarbers.local`
+- 4 default services.
 
 ### 5. Start the local Edge Function
 

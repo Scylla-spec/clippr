@@ -25,7 +25,7 @@ function makeRow(overrides: Partial<TodayQueueRow> & { status: TodayQueueRow['st
     service_name: 'Haircut',
     duration_min: 30,
     price: 5,
-    barber_name: 'Tendai',
+    barber_name: 'Alex',
     queue_bucket: 0,
     in_service_first: 0,
     ...overrides,
